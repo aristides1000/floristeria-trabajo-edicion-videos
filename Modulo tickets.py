@@ -8,7 +8,7 @@ import os  # Para abrir el archivo PDF
 def crear_base_datos():
     conn = sqlite3.connect('Floristeria.db')
     cursor = conn.cursor()
-    
+
     # Tabla de pedidos
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS pedidos (
