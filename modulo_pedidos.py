@@ -459,11 +459,11 @@ def abrir_gestion_modelos():
 def abrir_modulo_tickets():
     try:
         # Ejecutar el script Modulo_tickets.py
-        subprocess.run(["python", "Modulo tickets.py"], check=True)
+        subprocess.run(["python", "modulo_tickets.py"], check=True)
     except FileNotFoundError:
-        messagebox.showerror("Error", "No se encontró el archivo Modulo tickets.py.")
+        messagebox.showerror("Error", "No se encontró el archivo modulo_tickets.py.")
     except subprocess.CalledProcessError as e:
-        messagebox.showerror("Error", f"Ocurrió un error al ejecutar Modulo tickets.py: {e}")
+        messagebox.showerror("Error", f"Ocurrió un error al ejecutar modulo_tickets.py: {e}")
 
 # Conectar a la base de datos
 conectar_db()

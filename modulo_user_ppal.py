@@ -4,7 +4,7 @@ import sqlite3
 
 # Crear la base de datos SQLite
 def crear_base_datos():
-    conn = sqlite3.connect('Usuarios.db')
+    conn = sqlite3.connect('usuarios.db')
     cursor = conn.cursor()
     
     # Tabla de usuarios
@@ -34,7 +34,7 @@ def crear_base_datos():
 # Función para cargar usuarios en la tabla
 def cargar_usuarios():
     tree_usuarios.delete(*tree_usuarios.get_children())
-    conn = sqlite3.connect('Usuarios.db')
+    conn = sqlite3.connect('usuarios.db')
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM usuarios')
     rows = cursor.fetchall()
@@ -56,7 +56,7 @@ def registrar_usuario():
         return
     
     try:
-        conn = sqlite3.connect('Usuarios.db')
+        conn = sqlite3.connect('usuarios.db')
         cursor = conn.cursor()
         cursor.execute('''
             INSERT INTO usuarios (usuario, password, rol, acceso_pedidos, acceso_inventario, acceso_tickets)
@@ -90,7 +90,7 @@ def modificar_usuario():
         return
     
     try:
-        conn = sqlite3.connect('Usuarios.db')
+        conn = sqlite3.connect('usuarios.db')
         cursor = conn.cursor()
         cursor.execute('''
             UPDATE usuarios 
@@ -116,7 +116,7 @@ def eliminar_usuario():
     
     respuesta = messagebox.askyesno("Confirmar", "¿Está seguro de eliminar este usuario?")
     if respuesta:
-        conn = sqlite3.connect('Usuarios.db')
+        conn = sqlite3.connect('usuarios.db')
         cursor = conn.cursor()
         cursor.execute('DELETE FROM usuarios WHERE id = ?', (item_id,))
         conn.commit()

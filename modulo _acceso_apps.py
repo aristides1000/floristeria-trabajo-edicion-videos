@@ -6,7 +6,7 @@ import os  # Para manejar rutas de archivos
 
 # Crear la base de datos SQLite
 def crear_base_datos():
-    conn = sqlite3.connect('Usuarios.db')
+    conn = sqlite3.connect('usuarios.db')
     cursor = conn.cursor()
     
     # Tabla de usuarios
@@ -42,7 +42,7 @@ def iniciar_sesion():
         messagebox.showwarning("Advertencia", "Ingrese su usuario y contraseña.")
         return
     
-    conn = sqlite3.connect('Usuarios.db')
+    conn = sqlite3.connect('usuarios.db')
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM usuarios WHERE usuario = ? AND password = ?', (usuario, password))
     usuario_logueado = cursor.fetchone()
@@ -78,11 +78,11 @@ def mostrar_menu_principal(usuario_logueado):
     tk.Label(menu_window, text=f"Bienvenido, {usuario} ({rol})", bg="#f0f0f0", font=("Arial", 12, "bold")).pack(pady=10)
     
     if acceso_pedidos:
-        tk.Button(menu_window, text="Módulo de Pedidos", command=lambda: abrir_modulo("Modulo Pedidos.py"), width=20).pack(pady=5)
+        tk.Button(menu_window, text="Módulo de Pedidos", command=lambda: abrir_modulo("modulo_pedidos.py"), width=20).pack(pady=5)
     if acceso_inventario:
-        tk.Button(menu_window, text="Módulo de Inventario", command=lambda: abrir_modulo("Modulo Inventariov2.py"), width=20).pack(pady=5)
+        tk.Button(menu_window, text="Módulo de Inventario", command=lambda: abrir_modulo("modulo_inventario_v3.py"), width=20).pack(pady=5)
     if acceso_tickets:
-        tk.Button(menu_window, text="Módulo de Tickets", command=lambda: abrir_modulo("Modulo Tickets.py"), width=20).pack(pady=5)
+        tk.Button(menu_window, text="Módulo de Tickets", command=lambda: abrir_modulo("modulo_tickets.py"), width=20).pack(pady=5)
     
     tk.Button(menu_window, text="Cerrar Sesión", command=cerrar_menu, width=20).pack(pady=20)
 

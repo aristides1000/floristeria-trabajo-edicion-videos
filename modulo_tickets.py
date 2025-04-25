@@ -6,7 +6,7 @@ import os  # Para abrir el archivo PDF
 
 # Crear la base de datos SQLite
 def crear_base_datos():
-    conn = sqlite3.connect('Floristeria.db')
+    conn = sqlite3.connect('floristeria.db')
     cursor = conn.cursor()
 
     # Tabla de pedidos
@@ -29,7 +29,7 @@ def crear_base_datos():
 # Función para cargar los pedidos con estado "En Proceso"
 def cargar_pedidos():
     tree_pedidos.delete(*tree_pedidos.get_children())
-    conn = sqlite3.connect('Floristeria.db')
+    conn = sqlite3.connect('floristeria.db')
     cursor = conn.cursor()
     
     # Consulta SQL: Asegurarse de que el orden de las columnas coincida con el de la tabla Treeview
@@ -55,7 +55,7 @@ def actualizar_tipo_entrega():
     delivery_persona = entry_delivery_persona.get() if tipo_entrega == "Delivery" else "Retiran en Floristería"
     
     try:
-        conn = sqlite3.connect('Floristeria.db')
+        conn = sqlite3.connect('floristeria.db')
         cursor = conn.cursor()
         cursor.execute('''
             UPDATE pedidos 
@@ -80,7 +80,7 @@ def actualizar_tipo_entrega():
 # Función para generar un ticket en PDF para delivery
 def generar_ticket_seleccionado(item_id):
     try:
-        conn = sqlite3.connect('Floristeria.db')
+        conn = sqlite3.connect('floristeria.db')
         cursor = conn.cursor()
         
         # Consulta SQL: Asegurarse de que el orden de las columnas coincida con el de la tabla Treeview

@@ -5,7 +5,7 @@ from tkcalendar import DateEntry
 
 # Crear la base de datos SQLite y la tabla inventario2
 def crear_base_datos():
-    conn = sqlite3.connect('Floristeria.db')
+    conn = sqlite3.connect('floristeria.db')
     cursor = conn.cursor()
     # Tabla de inventario2 con descripción
     cursor.execute('''
@@ -24,7 +24,7 @@ def crear_base_datos():
 # Función para cargar el consolidado
 def cargar_consolidado():
     tree_consolidado.delete(*tree_consolidado.get_children())
-    conn = sqlite3.connect('Floristeria.db')
+    conn = sqlite3.connect('floristeria.db')
     cursor = conn.cursor()
     # Consulta para sumar por tipo
     cursor.execute('''
@@ -40,7 +40,7 @@ def cargar_consolidado():
 # Función para actualizar el inventario desde los pedidos enviados
 def actualizar_inventario():
     try:
-        conn = sqlite3.connect('Floristeria.db')
+        conn = sqlite3.connect('floristeria.db')
         cursor = conn.cursor()
         # Buscar pedidos con estado "Enviado"
         cursor.execute('SELECT modelo_ramo FROM pedidos WHERE estado = "Enviado"')
@@ -73,7 +73,7 @@ def actualizar_inventario():
 # Función para cargar el inventario en la tabla
 def cargar_inventario():
     tree_inventario.delete(*tree_inventario.get_children())
-    conn = sqlite3.connect('Floristeria.db')
+    conn = sqlite3.connect('floristeria.db')
     cursor = conn.cursor()
     cursor.execute('SELECT id,tipo, descripcion, cantidad, costo, fecha FROM inventario2')
     rows = cursor.fetchall()
@@ -94,7 +94,7 @@ def agregar_item():
     try:
         cantidad = int(cantidad)
         costo = float(costo)
-        conn = sqlite3.connect('Floristeria.db')
+        conn = sqlite3.connect('floristeria.db')
         cursor = conn.cursor()
         cursor.execute('''
             INSERT INTO inventario2 (tipo, descripcion, cantidad, costo, fecha) 
@@ -127,7 +127,7 @@ def modificar_item():
     try:
         cantidad = int(cantidad)
         costo = float(costo)
-        conn = sqlite3.connect('Floristeria.db')
+        conn = sqlite3.connect('floristeria.db')
         cursor = conn.cursor()
         cursor.execute('''
             UPDATE inventario2 
@@ -152,7 +152,7 @@ def eliminar_item():
     item_id = tree_inventario.item(seleccion)["values"][0]
     respuesta = messagebox.askyesno("Confirmar", "¿Está seguro de eliminar este ítem?")
     if respuesta:
-        conn = sqlite3.connect('Floristeria.db')
+        conn = sqlite3.connect('floristeria.db')
         cursor = conn.cursor()
         cursor.execute('DELETE FROM inventario2 WHERE id = ?', (item_id,))
         conn.commit()
