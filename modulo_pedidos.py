@@ -22,6 +22,7 @@ def conectar_db():
                         costo REAL,
                         fecha_hora_entrega TEXT,
                         enviado_a TEXT,
+                        nota TEXT,
                         estado TEXT)''')
     # Crear tabla de modelos de ramos si no existe
     cursor.execute('''CREATE TABLE IF NOT EXISTS modelos_ramos (
@@ -103,9 +104,9 @@ def agregar_pedido():
     try:
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO pedidos (fecha_hora, cliente, telefono, direccion, forma_pago, modelo_ramo, costo, fecha_hora_entrega, enviado_a, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        cursor.execute("INSERT INTO pedidos (fecha_hora, cliente, telefono, direccion, forma_pago, modelo_ramo, costo, fecha_hora_entrega, enviado_a, nota, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                        (fecha_hora, entry_cliente.get(), telefono_completo, entry_direccion.get(),
-                        forma_pago_var.get(), modelo_ramo, costo, fecha_hora_entrega, enviado_a, estado))
+                        forma_pago_var.get(), modelo_ramo, costo, fecha_hora_entrega, enviado_a, nota, estado))
         conn.commit()
     except sqlite3.Error as e:
         messagebox.showerror("Error", f"Ocurrió un error al agregar el pedido: {e}")
