@@ -89,6 +89,7 @@ def agregar_pedido():
     fecha_hora = f"{entry_fecha.get()} {hora_var.get()}"
     fecha_hora_entrega = f"{entry_entrega.get()} {hora_entrega_var.get()}"
     enviado_a = entry_enviado_a.get()
+    nota = entry_nota.get()
     estado = estado_var.get()
     modelo_ramo = modelo_ramo_var.get()  # Obtener el modelo seleccionado
     # Validar campos obligatorios
@@ -128,6 +129,7 @@ def modificar_pedido():
     fecha_hora = f"{entry_fecha.get()} {hora_var.get()}"
     fecha_hora_entrega = f"{entry_entrega.get()} {hora_entrega_var.get()}"
     enviado_a = entry_enviado_a.get()
+    nota = entry_nota.get()
     estado = estado_var.get()
     modelo_ramo = modelo_ramo_var.get()  # Obtener el modelo seleccionado
     # Validar campos obligatorios
@@ -144,9 +146,9 @@ def modificar_pedido():
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
         pedido_id = tree.item(selected_item)['values'][0]
-        cursor.execute("UPDATE pedidos SET fecha_hora=?, cliente=?, telefono=?, direccion=?, forma_pago=?, modelo_ramo=?, costo=?, fecha_hora_entrega=?, enviado_a=?, estado=? WHERE id=?",
+        cursor.execute("UPDATE pedidos SET fecha_hora=?, cliente=?, telefono=?, direccion=?, forma_pago=?, modelo_ramo=?, costo=?, fecha_hora_entrega=?, enviado_a=?, nota=?, estado=? WHERE id=?",
                        (fecha_hora, entry_cliente.get(), telefono_completo, entry_direccion.get(),
-                        forma_pago_var.get(), modelo_ramo, costo, fecha_hora_entrega, enviado_a, estado, pedido_id))
+                        forma_pago_var.get(), modelo_ramo, costo, fecha_hora_entrega, enviado_a, nota, estado, pedido_id))
         conn.commit()
     except sqlite3.Error as e:
         messagebox.showerror("Error", f"Ocurrió un error al modificar el pedido: {e}")
@@ -186,14 +188,15 @@ def mostrar_pedidos():
     try:
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM pedidos")
+        """ cursor.execute("SELECT * FROM pedidos") """
+        cursor.execute("SELECT id, fecha_hora, cliente, telefono, direccion, forma_pago, modelo_ramo, costo, fecha_hora_entrega, enviado_a, nota, estado FROM pedidos;")
         rows = cursor.fetchall()
         # Definir tags para los colores de fondo
         tree.tag_configure("en_proceso", background="#33f6ff")  # azul claro
         tree.tag_configure("enviado", background="#90EE90")     # Verde claro
         for row in rows:
             # Determinar el tag según el estado del pedido
-            estado = row[10]  # Última columna: estado
+            estado = row[11]  # Última columna: estado
             tag = "en_proceso" if estado == "En Proceso" else "enviado"
             # Insertar la fila con el tag correspondiente
             tree.insert("", tk.END, values=row, tags=(tag,))
@@ -233,7 +236,9 @@ def cargar_pedido(event):
             hora_entrega_var.set(pedido[8].split()[1])  # Hora de entrega
             entry_enviado_a.delete(0, tk.END)
             entry_enviado_a.insert(0, pedido[9])  # Enviado a
-            estado_var.set(pedido[10])  # Estado del pedido
+            entry_nota.delete(0, tk.END)
+            entry_nota.insert(0, pedido[10])
+            estado_var.set(pedido[11])  # Estado del pedido
         except Exception as e:
             messagebox.showerror("Error", f"Ocurrió un error al cargar los datos: {e}")
 
@@ -251,6 +256,7 @@ def limpiar_campos():
     entry_entrega.set_date(datetime.now().date())  # Establecer la fecha actual
     hora_entrega_var.set("08:00")  # Establecer una hora predeterminada
     entry_enviado_a.delete(0, tk.END)
+    entry_nota.delete(0, tk.END)
     estado_var.set("En Proceso")  # Estado predeterminado
 
 # Función para exportar datos a CSV
@@ -258,7 +264,7 @@ def exportar_a_csv():
     try:
         with open("pedidos.csv", mode="w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
-            writer.writerow(["ID", "Fecha y Hora", "Cliente", "Teléfono", "Dirección", "Forma de Pago", "Modelo del Ramo", "Costo", "Fecha y Hora Entrega", "Enviado a", "Estado"])
+            writer.writerow(["ID", "Fecha y Hora", "Cliente", "Teléfono", "Dirección", "Forma de Pago", "Modelo del Ramo", "Costo", "Fecha y Hora Entrega", "Enviado a", "Nota", "Estado"])
             for row in tree.get_children():
                 writer.writerow(tree.item(row)['values'])
         messagebox.showinfo("Éxito", "Datos exportados correctamente a pedidos.csv")
@@ -460,7 +466,7 @@ def abrir_gestion_modelos():
 def abrir_modulo_tickets():
     try:
         # Ejecutar el script Modulo_tickets.py
-        subprocess.run(["python", "modulo_tickets.py"], check=True)
+        subprocess.run(["python3", "./modulo_tickets.py"], check=True)
     except FileNotFoundError:
         messagebox.showerror("Error", "No se encontró el archivo modulo_tickets.py.")
     except subprocess.CalledProcessError as e:
@@ -518,13 +524,14 @@ entry_costo = ttk.Entry(form_frame, width=20)
 entry_entrega = DateEntry(form_frame, date_pattern='yyyy-MM-dd')
 hora_entrega_var = tk.StringVar()
 entry_enviado_a = ttk.Entry(form_frame, width=40)
+entry_nota = ttk.Entry(form_frame, width=60)
 estado_var = tk.StringVar()
 
 # Bucle para crear los campos del formulario
 labels = [
     "Fecha del Pedido", "Hora del Pedido (HH:MM)", "Cliente",
     "Teléfono", "Forma de Pago", "Modelo del Ramo",
-    "Costo", "Fecha de Entrega", "Hora de Entrega (HH:MM)", "Enviado a"
+    "Costo", "Fecha de Entrega", "Hora de Entrega (HH:MM)", "Enviado a", "Nota"
 ]
 row_index = 0  # Índice para controlar las filas
 for i, text in enumerate(labels):
@@ -581,6 +588,11 @@ for i, text in enumerate(labels):
         ttk.Label(form_frame, text=text, anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
         entry_enviado_a.grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
         row_index += 1
+    elif text == "Nota":
+        # Entrada para "Nota"
+        ttk.Label(form_frame, text="Nota", anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
+        entry_nota.grid(row=row_index, column=1, columnspan=3, padx=5, pady=5, sticky="ew")  # Expandir horizontalmente
+        row_index += 1
     else:
         # Entradas generales
         ttk.Label(form_frame, text=text, anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
@@ -625,7 +637,7 @@ ttk.Button(search_frame, text="Buscar", command=buscar_pedidos).pack(side="left"
 # Tabla de pedidos
 tree_frame = ttk.Frame(main_frame)
 tree_frame.pack(fill="both", expand=True, pady=10)
-tree = ttk.Treeview(tree_frame, columns=("ID", "Fecha y Hora", "Cliente", "Teléfono", "Dirección", "Forma de Pago", "Modelo del Ramo", "Costo", "Fecha y Hora Entrega", "Enviado a", "Estado"), show="headings")
+tree = ttk.Treeview(tree_frame, columns=("ID", "Fecha y Hora", "Cliente", "Teléfono", "Dirección", "Forma de Pago", "Modelo del Ramo", "Costo", "Fecha y Hora Entrega", "Enviado a", "Nota", "Estado"), show="headings")
 for col in tree['columns']:
     tree.heading(col, text=col)
     tree.column(col, width=120, anchor="center")

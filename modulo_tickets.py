@@ -19,6 +19,7 @@ def crear_base_datos():
             delivery_persona TEXT,  -- Persona que realiza el Delivery
             enviado_a TEXT,         -- Dirección o persona a quien se envía
             tipo_entrega TEXT NOT NULL,  -- Recoger / Delivery
+            nota TEXT,
             estado TEXT NOT NULL
         )
     ''')
@@ -34,7 +35,7 @@ def cargar_pedidos():
     
     # Consulta SQL: Asegurarse de que el orden de las columnas coincida con el de la tabla Treeview
     cursor.execute('''
-        SELECT id, cliente, telefono, direccion, delivery_persona, enviado_a, tipo_entrega, estado 
+        SELECT id, cliente, telefono, direccion, delivery_persona, enviado_a, tipo_entrega, nota, estado 
         FROM pedidos 
         WHERE estado = "En Proceso"
     ''')
@@ -85,7 +86,7 @@ def generar_ticket_seleccionado(item_id):
         
         # Consulta SQL: Asegurarse de que el orden de las columnas coincida con el de la tabla Treeview
         cursor.execute('''
-            SELECT id, cliente, telefono, direccion, delivery_persona, enviado_a, tipo_entrega, estado 
+            SELECT id, cliente, telefono, direccion, delivery_persona, enviado_a, tipo_entrega, nota, estado 
             FROM pedidos 
             WHERE id = ?
         ''', (item_id,))
@@ -97,7 +98,7 @@ def generar_ticket_seleccionado(item_id):
             return
         
         # Asignar los datos correctamente según el orden de la consulta SQL
-        id_pedido, cliente, telefono, direccion, delivery_persona, enviado_a, tipo_entrega, estado = pedido
+        id_pedido, cliente, telefono, direccion, delivery_persona, enviado_a, tipo_entrega, nota, estado = pedido
         
         # Solicitar el nombre del archivo PDF al usuario
         nombre_archivo = simpledialog.askstring(
@@ -130,7 +131,8 @@ def generar_ticket_seleccionado(item_id):
         pdf.cell(200, 10, txt=f"Dirección: {direccion}", ln=True)
         pdf.cell(200, 10, txt=f"Persona que realiza el Delivery: {delivery_persona}", ln=True)
         pdf.cell(200, 10, txt=f"Enviado a: {enviado_a}", ln=True)
-        pdf.cell(200, 10, txt=f"Tipo de Entrega: {tipo_entrega}", ln=True)
+        pdf.cell(200, 10, txt=f"Tipo de Entrega: {tipo_entrega}", ln=True),
+        pdf.cell(200, 10, txt=f"Nota: {nota}", ln=True),
         pdf.cell(200, 10, txt=f"Estado: {estado}", ln=True)
         
         # Guardar y abrir el PDF
@@ -199,7 +201,7 @@ btn_actualizar = ttk.Button(frame_botones, text="Actualizar Tipo de Entrega", co
 btn_actualizar.grid(row=0, column=0, padx=5)
 
 # Tabla de pedidos
-columns = ("ID", "Cliente", "Teléfono", "Dirección", "Persona que realiza el Delivery", "Enviado a", "Tipo de Entrega", "Estado")
+columns = ("ID", "Cliente", "Teléfono", "Dirección", "Persona que realiza el Delivery", "Enviado a", "Tipo de Entrega", "Nota", "Estado")
 tree_pedidos = ttk.Treeview(root, columns=columns, show="headings", height=10)
 for col in columns:
     tree_pedidos.heading(col, text=col)

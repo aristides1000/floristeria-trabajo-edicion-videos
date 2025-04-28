@@ -1,0 +1,4 @@
+ID,Fecha y Hora,Cliente,Teléfono,Dirección,Forma de Pago,Modelo del Ramo,Costo,Fecha y Hora Entrega,Enviado a,Nota,Estado
+19,2025-04-14 03:00,dsfkjhgsdf,212123456789,dsfdf,Transferencia,Arreglo 2,250.0,2025-04-16 02:00,Maria,En Proceso,Delivery,Luis,None
+21,2025-04-25 18:00,juan,2121234567,Chacao,Transferencia,Arreglo 1,100.0,2025-04-29 18:00,Maria,En Proceso,None,None,None
+23,2025-04-28 18:00,Carlos,2127456123,Cagua,PagoMóvil,Arreglo 3,300.0,2025-04-29 19:00,maria,En Proceso,None,None,bombones
