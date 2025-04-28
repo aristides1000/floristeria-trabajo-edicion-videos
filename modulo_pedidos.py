@@ -218,10 +218,10 @@ def cargar_pedido(event):
             entry_cliente.insert(0, pedido[2])  # Cliente
             # Manejar el número de teléfono
             telefono_completo = str(pedido[3])  # Convertir explícitamente a cadena
-            if len(telefono_completo) >= 4:  # Verificar longitud mínima para el prefijo
-                prefijo_var.set(telefono_completo[:4])  # Prefijo del teléfono
+            if len(telefono_completo) >= 3:  # Verificar longitud mínima para el prefijo
+                prefijo_var.set(telefono_completo[:3])  # Prefijo del teléfono
                 entry_telefono.delete(0, tk.END)
-                entry_telefono.insert(0, telefono_completo[4:])  # Teléfono
+                entry_telefono.insert(0, telefono_completo[3:])  # Teléfono
             else:
                 prefijo_var.set("")  # Limpiar el Combobox si no hay suficientes caracteres
                 entry_telefono.delete(0, tk.END)
@@ -538,7 +538,7 @@ for i, text in enumerate(labels):
     if text == "Teléfono":
         # Etiqueta y combobox para el prefijo del teléfono
         ttk.Label(form_frame, text="Prefijo Teléfono", anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
-        prefijo_combobox = ttk.Combobox(form_frame, textvariable=prefijo_var, values=["0212", "0412", "0416", "0426", "0414", "0424"], state="readonly", width=10)
+        prefijo_combobox = ttk.Combobox(form_frame, textvariable=prefijo_var, values=["212", "412", "416", "426", "414", "424"], state="readonly", width=10)
         prefijo_combobox.grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
         prefijo_combobox.current(0)
         # Etiqueta y entrada para los dígitos del teléfono
