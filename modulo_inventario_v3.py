@@ -2,20 +2,23 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import sqlite3
 from tkcalendar import DateEntry
+from datetime import datetime
 
-# Crear la base de datos SQLite y la tabla inventario2
+# Crear la base de datos SQLite y la tabla inventario
 def crear_base_datos():
     conn = sqlite3.connect('floristeria.db')
     cursor = conn.cursor()
-    # Tabla de inventario2 con descripción
+    # Tabla de inventario con descripción
     cursor.execute('''
-        CREATE TABLE IF NOT EXISTS inventario2 (
+        CREATE TABLE IF NOT EXISTS inventario (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            tipo TEXT NOT NULL,
-            descripcion TEXT,  -- Nueva columna para la descripción
+            nombre TEXT NOT NULL,
+            tipo TEXT NOT NULL,  -- 'Rosa', 'Flor', 'Extra'
             cantidad INTEGER NOT NULL,
-            costo REAL NOT NULL,
-            fecha TEXT NOT NULL
+            unidad TEXT NOT NULL,  -- 'Docena' o 'Unidad'
+            fecha_carga TEXT NOT NULL,  -- Fecha y hora de carga
+            precio_costo REAL NOT NULL,  -- Precio de costo\
+            descripcion TEXT
         )
     ''')
     conn.commit()
@@ -29,7 +32,7 @@ def cargar_consolidado():
     # Consulta para sumar por tipo
     cursor.execute('''
         SELECT tipo, SUM(cantidad) 
-        FROM inventario2 
+        FROM inventario 
         GROUP BY tipo
     ''')
     rows = cursor.fetchall()
@@ -56,10 +59,10 @@ def actualizar_inventario():
             detalles_ramo = cursor.fetchone()
             if detalles_ramo:
                 cantidad_rosas, cantidad_flores, cantidad_extras = detalles_ramo
-                # Actualizar inventario2
-                cursor.execute('UPDATE inventario2 SET cantidad = cantidad - ? WHERE tipo = "Rosas"', (cantidad_rosas,))
-                cursor.execute('UPDATE inventario2 SET cantidad = cantidad - ? WHERE tipo = "Flores"', (cantidad_flores,))
-                cursor.execute('UPDATE inventario2 SET cantidad = cantidad - ? WHERE tipo = "Extras"', (cantidad_extras,))
+                # Actualizar inventario
+                cursor.execute('UPDATE inventario SET cantidad = cantidad - ? WHERE tipo = "Rosas"', (cantidad_rosas,))
+                cursor.execute('UPDATE inventario SET cantidad = cantidad - ? WHERE tipo = "Flores"', (cantidad_flores,))
+                cursor.execute('UPDATE inventario SET cantidad = cantidad - ? WHERE tipo = "Extras"', (cantidad_extras,))
                 # Eliminar el pedido enviado
                 cursor.execute('DELETE FROM pedidos WHERE modelo_ramo = ?', (modelo_ramo,))
         conn.commit()
@@ -75,7 +78,7 @@ def cargar_inventario():
     tree_inventario.delete(*tree_inventario.get_children())
     conn = sqlite3.connect('floristeria.db')
     cursor = conn.cursor()
-    cursor.execute('SELECT id,tipo, descripcion, cantidad, costo, fecha FROM inventario2')
+    cursor.execute('SELECT id, nombre, tipo, cantidad, unidad, fecha_carga, precio_costo, descripcion FROM inventario')
     rows = cursor.fetchall()
     for row in rows:
         tree_inventario.insert("", "end", values=row)
@@ -83,11 +86,14 @@ def cargar_inventario():
 
 # Función para agregar un ítem al inventario
 def agregar_item():
+    nombre = entry_nombre.get().strip()
     tipo = combo_tipo.get()
-    descripcion = entry_descripcion.get()  # Obtener descripción
     cantidad = entry_cantidad.get()
-    costo = entry_costo.get()
-    fecha = entry_fecha.get_date().strftime("%Y-%m-%d")
+    unidad = unidad_var.get()
+    # Obtener la fecha y hora actual para la fecha de carga
+    fecha_carga = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    precio_costo = entry_precio_costo.get().strip()
+    descripcion = entry_descripcion.get()  # Obtener descripción
     if not tipo or not cantidad or not costo:
         messagebox.showwarning("Advertencia", "Todos los campos son obligatorios.")
         return
@@ -97,9 +103,9 @@ def agregar_item():
         conn = sqlite3.connect('floristeria.db')
         cursor = conn.cursor()
         cursor.execute('''
-            INSERT INTO inventario2 (tipo, descripcion, cantidad, costo, fecha) 
-            VALUES (?, ?, ?, ?, ?)
-        ''', (tipo, descripcion, cantidad, costo, fecha))  # Incluir descripción
+            INSERT INTO inventario (nombre, tipo, cantidad, unidad, fecha_carga, precio_costo, descripcion) 
+            VALUES (?, ?, ?, ?, ?, ?, ?)
+        ''', (nombre, tipo, cantidad, unidad, fecha_carga, precio_costo, descripcion))  # Incluir descripción
         conn.commit()
         conn.close()
         cargar_inventario()
@@ -116,11 +122,13 @@ def modificar_item():
         messagebox.showwarning("Advertencia", "Seleccione un ítem para modificar.")
         return
     item_id = tree_inventario.item(seleccion)["values"][0]
+    nombre = entry_nombre.get().strip()
     tipo = combo_tipo.get()
-    descripcion = entry_descripcion.get()  # Obtener descripción
     cantidad = entry_cantidad.get()
-    costo = entry_costo.get()
-    fecha = entry_fecha.get_date().strftime("%Y-%m-%d")
+    unidad = unidad_var.get()
+    fecha_carga = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    precio_costo = entry_precio_costo.get().strip()
+    descripcion = entry_descripcion.get()  # Obtener descripción
     if not tipo or not cantidad or not costo:
         messagebox.showwarning("Advertencia", "Todos los campos son obligatorios.")
         return
@@ -130,10 +138,10 @@ def modificar_item():
         conn = sqlite3.connect('floristeria.db')
         cursor = conn.cursor()
         cursor.execute('''
-            UPDATE inventario2 
-            SET tipo = ?, descripcion = ?, cantidad = ?, costo = ?, fecha = ? 
+            UPDATE inventario 
+            SET nombre = ?, tipo = ?, cantidad = ?, unidad = ?, fecha_carga = ?, precio_costo = ?, descripcion = ? 
             WHERE id = ?
-        ''', (tipo, descripcion, cantidad, costo, fecha, item_id))  # Incluir descripción
+        ''', (nombre, tipo, cantidad, unidad, fecha_carga, precio_costo, descripcion, item_id))  # Incluir descripción
         conn.commit()
         conn.close()
         cargar_inventario()
@@ -154,7 +162,7 @@ def eliminar_item():
     if respuesta:
         conn = sqlite3.connect('floristeria.db')
         cursor = conn.cursor()
-        cursor.execute('DELETE FROM inventario2 WHERE id = ?', (item_id,))
+        cursor.execute('DELETE FROM inventario WHERE id = ?', (item_id,))
         conn.commit()
         conn.close()
         cargar_inventario()
@@ -164,16 +172,22 @@ def eliminar_item():
 
 # Función para limpiar los campos de entrada
 def limpiar_campos():
+    entry_nombre.delete(0, tk.END)
     combo_tipo.set("")
-    entry_descripcion.delete(0, tk.END)  # Limpiar descripción
     entry_cantidad.delete(0, tk.END)
-    entry_costo.delete(0, tk.END)
+    unidad_var.set("")
+    entry_fecha_carga.set_date(datetime.now().date())  # Establecer la fecha actual
+    entry_precio_costo.delete(0, tk.END)
+    entry_descripcion.delete(0, tk.END)  # Limpiar descripción
 
 # Configuración de la interfaz gráfica
 root = tk.Tk()
 root.title("Control de Inventario - Floristería")
 root.geometry("1200x800")
 root.configure(bg="#f0f0f0")
+
+# Variables para los widgets del inventario
+
 
 # Estilo para los widgets
 style = ttk.Style()
@@ -188,25 +202,42 @@ style.configure("Treeview.Heading", font=("Arial", 10, "bold"))
 crear_base_datos()
 
 # Etiquetas y campos de entrada
+ttk.Label(root, text="Nombre", anchor="w").grid(row=0, column=0, padx=5, pady=5, sticky="w")
+entry_nombre = ttk.Entry(root, width=40)
+entry_nombre.grid(row=0, column=1, padx=5, pady=5, sticky="w")
+
 tk.Label(root, text="Tipo:", bg="#f0f0f0", font=("Arial", 10, "bold")).grid(row=0, column=0, padx=10, pady=5, sticky="w")
 combo_tipo = ttk.Combobox(root, values=["Rosas", "Flores", "Extras"], state="readonly", width=20)
 combo_tipo.grid(row=0, column=1, padx=10, pady=5, sticky="w")
-
-tk.Label(root, text="Descripción:", bg="#f0f0f0", font=("Arial", 10, "bold")).grid(row=1, column=0, padx=10, pady=5, sticky="w")
-entry_descripcion = tk.Entry(root, width=60, font=("Arial", 10))  # Nuevo campo para descripción
-entry_descripcion.grid(row=1, column=1, padx=10, pady=5, sticky="w")
 
 tk.Label(root, text="Cantidad:", bg="#f0f0f0", font=("Arial", 10, "bold")).grid(row=2, column=0, padx=10, pady=5, sticky="w")
 entry_cantidad = tk.Entry(root, width=20, font=("Arial", 10))
 entry_cantidad.grid(row=2, column=1, padx=10, pady=5, sticky="w")
 
-tk.Label(root, text="Costo:", bg="#f0f0f0", font=("Arial", 10, "bold")).grid(row=3, column=0, padx=10, pady=5, sticky="w")
-entry_costo = tk.Entry(root, width=20, font=("Arial", 10))
-entry_costo.grid(row=3, column=1, padx=10, pady=5, sticky="w")
+ttk.Label(root, text="Unidad", anchor="w").grid(row=0, column=6, padx=5, pady=5, sticky="w")
+unidad_var = tk.StringVar()
+unidad_combobox = ttk.Combobox(root, textvariable=unidad_var, values=["Docena", "Unidad"], state="readonly")
+unidad_combobox.grid(row=0, column=7, padx=5, pady=5, sticky="w")
 
-tk.Label(root, text="Fecha:", bg="#f0f0f0", font=("Arial", 10, "bold")).grid(row=4, column=0, padx=10, pady=5, sticky="w")
+ttk.Label(root, text="Fecha de Carga", anchor="w").grid(row=1, column=2, padx=5, pady=5, sticky="w")
+entry_fecha_carga = DateEntry(root, date_pattern='yyyy-MM-dd', state="readonly")  # Fecha de carga
+entry_fecha_carga.grid(row=1, column=3, padx=5, pady=5, sticky="w")
+
+""" tk.Label(root, text="Fecha:", bg="#f0f0f0", font=("Arial", 10, "bold")).grid(row=4, column=0, padx=10, pady=5, sticky="w")
 entry_fecha = DateEntry(root, date_pattern="yyyy-mm-dd", width=18, font=("Arial", 10))
-entry_fecha.grid(row=4, column=1, padx=10, pady=5, sticky="w")
+entry_fecha.grid(row=4, column=1, padx=10, pady=5, sticky="w") """
+
+ttk.Label(root, text="Precio de Costo", anchor="w").grid(row=1, column=0, padx=5, pady=5, sticky="w")
+entry_precio_costo = ttk.Entry(root, width=10)
+entry_precio_costo.grid(row=1, column=1, padx=5, pady=5, sticky="w")
+
+""" tk.Label(root, text="Costo:", bg="#f0f0f0", font=("Arial", 10, "bold")).grid(row=3, column=0, padx=10, pady=5, sticky="w")
+entry_costo = tk.Entry(root, width=20, font=("Arial", 10))
+entry_costo.grid(row=3, column=1, padx=10, pady=5, sticky="w") """
+
+tk.Label(root, text="Descripción:", bg="#f0f0f0", font=("Arial", 10, "bold")).grid(row=1, column=0, padx=10, pady=5, sticky="w")
+entry_descripcion = tk.Entry(root, width=60, font=("Arial", 10))  # Nuevo campo para descripción
+entry_descripcion.grid(row=1, column=1, padx=10, pady=5, sticky="w")
 
 # Botones
 frame_botones = tk.Frame(root, bg="#f0f0f0")
@@ -221,7 +252,7 @@ btn_actualizar = ttk.Button(root, text="Actualizar Inventario", command=actualiz
 btn_actualizar.grid(row=6, column=0, columnspan=2, pady=10)
 
 # Tabla de inventario
-columns = ("ID", "Tipo", "Descripción", "Cantidad", "Costo", "Fecha")
+columns = ("ID", "Nombre", "Tipo", "Cantidad", "Unidad", "Fecha de Carga", "Precio de Costo", "Descripción")
 tree_inventario = ttk.Treeview(root, columns=columns, show="headings", height=10)
 for col in columns:
     tree_inventario.heading(col, text=col)

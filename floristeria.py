@@ -12,12 +12,13 @@ def conectar_db():
     # Crear tabla de inventario si no existe
     cursor.execute('''CREATE TABLE IF NOT EXISTS inventario (
                         id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        nombre TEXT,
-                        tipo TEXT,  -- 'Rosa', 'Flor', 'Extra'
-                        cantidad INTEGER,
-                        unidad TEXT,  -- 'Docena' o 'Unidad'
-                        precio_costo REAL,  -- Precio de costo
-                        fecha_carga TEXT  -- Fecha y hora de carga
+                        nombre TEXT NOT NULL,
+                        tipo TEXT NOT NULL,  -- 'Rosa', 'Flor', 'Extra'
+                        cantidad INTEGER NOT NULL,
+                        unidad TEXT NOT NULL,  -- 'Docena' o 'Unidad'
+                        fecha_carga TEXT NOT NULL,  -- Fecha y hora de carga
+                        precio_costo REAL NOT NULL,  -- Precio de costo\
+                        descripcion TEXT
                     )''')
 
     conn.commit()
@@ -27,7 +28,7 @@ def conectar_db():
 def mostrar_inventario():
     for row in tree_inventario.get_children():
         tree_inventario.delete(row)
-    
+
     conn = sqlite3.connect("floristeria.db")
     cursor = conn.cursor()
     cursor.execute("SELECT * FROM inventario")
@@ -45,6 +46,7 @@ def agregar_inventario():
     cantidad = entry_cantidad.get().strip()
     unidad = unidad_var.get()
     precio_costo = entry_precio_costo.get().strip()
+    descripcion = entry_descripcion.get().strip()
 
     # Validar campos obligatorios
     if not (nombre and tipo and cantidad and unidad and precio_costo):
@@ -67,8 +69,8 @@ def agregar_inventario():
 
     conn = sqlite3.connect("floristeria.db")
     cursor = conn.cursor()
-    cursor.execute("INSERT INTO inventario (nombre, tipo, cantidad, unidad, precio_costo, fecha_carga) VALUES (?, ?, ?, ?, ?, ?)",
-                   (nombre, tipo, cantidad, unidad, precio_costo, fecha_carga))
+    cursor.execute("INSERT INTO inventario (nombre, tipo, cantidad, unidad, fecha_carga, precio_costo, descripcion) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                   (nombre, tipo, cantidad, unidad, fecha_carga, precio_costo, descripcion))
     conn.commit()
     conn.close()
 
@@ -88,6 +90,7 @@ def modificar_inventario():
     cantidad = entry_cantidad.get().strip()
     unidad = unidad_var.get()
     precio_costo = entry_precio_costo.get().strip()
+    descripcion = entry_descripcion.get().strip()
 
     # Validar campos obligatorios
     if not (nombre and tipo and cantidad and unidad and precio_costo):
@@ -111,8 +114,8 @@ def modificar_inventario():
     conn = sqlite3.connect("floristeria.db")
     cursor = conn.cursor()
     item_id = tree_inventario.item(selected_item)['values'][0]
-    cursor.execute("UPDATE inventario SET nombre=?, tipo=?, cantidad=?, unidad=?, precio_costo=?, fecha_carga=? WHERE id=?",
-                   (nombre, tipo, cantidad, unidad, precio_costo, fecha_carga, item_id))
+    cursor.execute("UPDATE inventario SET nombre=?, tipo=?, cantidad=?, unidad=?, fecha_carga=?precio_costo=?, descripcion=? WHERE id=?",
+                   (nombre, tipo, cantidad, unidad, fecha_carga, precio_costo, descripcion, item_id))
     conn.commit()
     conn.close()
 
@@ -150,10 +153,12 @@ def cargar_inventario(event):
         entry_cantidad.insert(0, item[3])  # Cantidad
         unidad_var.set(item[4])  # Unidad
         entry_precio_costo.delete(0, tk.END)
-        entry_precio_costo.insert(0, item[5])  # Precio de costo
+        entry_precio_costo.insert(0, item[6])  # Precio de costo
+        entry_descripcion.delete(0, tk.END)
+        entry_descripcion.insert(0, item[7])  # Descripcion
 
         # Mostrar la fecha de carga
-        fecha_carga = item[6]  # Fecha de carga
+        fecha_carga = item[5]  # Fecha de carga
         entry_fecha_carga.set_date(datetime.strptime(fecha_carga.split()[0], "%Y-%m-%d").date())
 
 # Función para limpiar los campos de entrada del inventario
@@ -162,8 +167,9 @@ def limpiar_campos_inventario():
     tipo_var.set("")
     entry_cantidad.delete(0, tk.END)
     unidad_var.set("")
-    entry_precio_costo.delete(0, tk.END)
     entry_fecha_carga.set_date(datetime.now().date())  # Establecer la fecha actual
+    entry_precio_costo.delete(0, tk.END)
+    entry_descripcion.delete(0, tk.END)
 
 # Función para actualizar el inventario acumulado
 def actualizar_inventario_acumulado():
@@ -203,8 +209,9 @@ entry_nombre = ttk.Entry(inventario_frame, width=40)
 tipo_var = tk.StringVar()
 entry_cantidad = ttk.Entry(inventario_frame, width=10)
 unidad_var = tk.StringVar()
-entry_precio_costo = ttk.Entry(inventario_frame, width=10)
 entry_fecha_carga = DateEntry(inventario_frame, date_pattern='yyyy-MM-dd', state="readonly")  # Fecha de carga
+entry_precio_costo = ttk.Entry(inventario_frame, width=10)
+entry_descripcion = ttk.Entry(inventario_frame, width=60)
 
 # Campos del formulario de inventario
 ttk.Label(inventario_frame, text="Nombre", anchor="w").grid(row=0, column=0, padx=5, pady=5, sticky="w")
@@ -221,11 +228,14 @@ ttk.Label(inventario_frame, text="Unidad", anchor="w").grid(row=0, column=6, pad
 unidad_combobox = ttk.Combobox(inventario_frame, textvariable=unidad_var, values=["Docena", "Unidad"], state="readonly")
 unidad_combobox.grid(row=0, column=7, padx=5, pady=5, sticky="w")
 
+ttk.Label(inventario_frame, text="Fecha de Carga", anchor="w").grid(row=1, column=2, padx=5, pady=5, sticky="w")
+entry_fecha_carga.grid(row=1, column=3, padx=5, pady=5, sticky="w")
+
 ttk.Label(inventario_frame, text="Precio de Costo", anchor="w").grid(row=1, column=0, padx=5, pady=5, sticky="w")
 entry_precio_costo.grid(row=1, column=1, padx=5, pady=5, sticky="w")
 
-ttk.Label(inventario_frame, text="Fecha de Carga", anchor="w").grid(row=1, column=2, padx=5, pady=5, sticky="w")
-entry_fecha_carga.grid(row=1, column=3, padx=5, pady=5, sticky="w")
+ttk.Label(inventario_frame, text="Descripcion", anchor="w").grid(row=0, column=0, padx=5, pady=5, sticky="w")
+entry_descripcion.grid(row=0, column=1, padx=5, pady=5, sticky="w")
 
 # Botones del inventario
 btn_frame_inventario = ttk.Frame(inventario_frame)
