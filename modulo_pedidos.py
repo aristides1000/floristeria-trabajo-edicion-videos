@@ -75,7 +75,7 @@ def calcular_costo_acumulado():
     try:
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT SUM(costo) FROM pedidos")
+        cursor.execute("SELECT SUM(costo + costo_adicional) FROM pedidos")
         resultado = cursor.fetchone()[0]
         costo_acumulado = resultado if resultado else 0.0  # Si no hay pedidos, el costo es 0.0
         costo_acumulado_var.set(round(costo_acumulado, 2))  # Actualizar la variable con el costo acumulado
