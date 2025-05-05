@@ -54,7 +54,7 @@ def limpiar_campos():
 # Configuración de la ventana principal
 root = tk.Tk()
 root.title("Calculo de Costos por rango - Floristería")
-root.geometry("900x600")  # Tamaño inicial de la ventana
+root.geometry("341x350")  # Tamaño inicial de la ventana
 root.resizable(True, True)
 
 # Estilo personalizado
