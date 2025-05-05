@@ -90,7 +90,7 @@ def abrir_modulo_tickets():
 # Botones
 btn_frame = ttk.Frame(main_frame)
 btn_frame.pack(fill="x", pady=10)
-ttk.Label(btn_frame, text="Menu de la Floristeria", font=("Arial", 20)).grid(row=0, column=0, padx=5, pady=5, sticky="w", columnspan=2)
+ttk.Label(btn_frame, text="Menu de la Floristeria", font=("Arial", 20, "bold")).grid(row=0, column=0, padx=5, pady=5, sticky="w", columnspan=2)
 ttk.Button(btn_frame, text="Abrir Floristeria", command=abrir_floristeria).grid(row=1, column=0, padx=5, pady=5, sticky="w")
 ttk.Button(btn_frame, text="Abrir Dinero Rango Fechas", command=abrir_modulo_dinero_rango_fechas).grid(row=1, column=1, padx=5, pady=5, sticky="w")
 ttk.Button(btn_frame, text="Abrir Inventario", command=abrir_modulo_inventario_v3).grid(row=2, column=0, padx=5, pady=5, sticky="w")
