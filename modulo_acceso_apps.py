@@ -8,7 +8,7 @@ import os  # Para manejar rutas de archivos
 def crear_base_datos():
     conn = sqlite3.connect('usuarios.db')
     cursor = conn.cursor()
-    
+
     # Tabla de usuarios
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS usuarios (
@@ -21,7 +21,7 @@ def crear_base_datos():
             acceso_tickets INTEGER DEFAULT 0
         )
     ''')
-    
+
     # Crear usuario administrador por defecto si no existe
     cursor.execute('SELECT * FROM usuarios WHERE usuario = "admin"')
     if not cursor.fetchone():
@@ -29,7 +29,7 @@ def crear_base_datos():
             INSERT INTO usuarios (usuario, password, rol, acceso_pedidos, acceso_inventario, acceso_tickets)
             VALUES (?, ?, ?, ?, ?, ?)
         ''', ("admin", "admin123", "admin", 1, 1, 1))
-    
+
     conn.commit()
     conn.close()
 
@@ -37,53 +37,53 @@ def crear_base_datos():
 def iniciar_sesion():
     usuario = entry_usuario.get()
     password = entry_password.get()
-    
+
     if not usuario or not password:
         messagebox.showwarning("Advertencia", "Ingrese su usuario y contraseña.")
         return
-    
+
     conn = sqlite3.connect('usuarios.db')
     cursor = conn.cursor()
     cursor.execute('SELECT * FROM usuarios WHERE usuario = ? AND password = ?', (usuario, password))
     usuario_logueado = cursor.fetchone()
     conn.close()
-    
+
     if not usuario_logueado:
         messagebox.showerror("Error", "Usuario o contraseña incorrectos.")
         return
-    
+
     # Mostrar la pantalla de acceso a módulos
     mostrar_menu_principal(usuario_logueado)
 
 # Función para mostrar la pantalla de acceso a módulos
 def mostrar_menu_principal(usuario_logueado):
     id_usuario, usuario, password, rol, acceso_pedidos, acceso_inventario, acceso_tickets = usuario_logueado
-    
+
     # Ocultar la pantalla de inicio de sesión
     login_window.withdraw()
-    
+
     # Crear la pantalla de acceso a módulos
     menu_window = tk.Toplevel(root)
     menu_window.title("Menú Principal")
     menu_window.geometry("400x300")
     menu_window.configure(bg="#f0f0f0")
-    
+
     # Manejar el cierre de la ventana de menú
     def cerrar_menu():
         menu_window.destroy()
         login_window.deiconify()  # Mostrar la pantalla de inicio de sesión nuevamente
-    
+
     menu_window.protocol("WM_DELETE_WINDOW", cerrar_menu)  # Asociar el evento de cierre
-    
+
     tk.Label(menu_window, text=f"Bienvenido, {usuario} ({rol})", bg="#f0f0f0", font=("Arial", 12, "bold")).pack(pady=10)
-    
+
     if acceso_pedidos:
         tk.Button(menu_window, text="Módulo de Pedidos", command=lambda: abrir_modulo("modulo_pedidos.py"), width=20).pack(pady=5)
     if acceso_inventario:
         tk.Button(menu_window, text="Módulo de Inventario", command=lambda: abrir_modulo("modulo_inventario_v3.py"), width=20).pack(pady=5)
     if acceso_tickets:
         tk.Button(menu_window, text="Módulo de Tickets", command=lambda: abrir_modulo("modulo_tickets.py"), width=20).pack(pady=5)
-    
+
     tk.Button(menu_window, text="Cerrar Sesión", command=cerrar_menu, width=20).pack(pady=20)
 
 # Función para abrir un módulo externo
@@ -93,7 +93,7 @@ def abrir_modulo(modulo):
         if not os.path.isfile(modulo):
             messagebox.showerror("Error", f"No se encontró el archivo '{modulo}'.")
             return
-        
+
         # Ejecutar el script externo usando subprocess
         subprocess.Popen(["python", modulo])
     except Exception as e:
