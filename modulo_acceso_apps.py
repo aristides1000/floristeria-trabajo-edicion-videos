@@ -17,8 +17,10 @@ def crear_base_datos():
             password TEXT NOT NULL,
             rol TEXT NOT NULL,  -- "admin" o "usuario"
             acceso_floristeria INTEGER DEFAULT 0, -- 1 = acceso permitido, 0 = acceso denegado
-            acceso_pedidos INTEGER DEFAULT 0,
             acceso_inventario INTEGER DEFAULT 0,
+            acceso_pedidos INTEGER DEFAULT 0,
+            acceso_saldo INTEGER DEFAULT 0,
+            acceso_status INTEGER DEFAULT 0,
             acceso_tickets INTEGER DEFAULT 0
         )
     ''')
@@ -27,9 +29,9 @@ def crear_base_datos():
     cursor.execute('SELECT * FROM usuarios WHERE usuario = "admin"')
     if not cursor.fetchone():
         cursor.execute('''
-            INSERT INTO usuarios (usuario, password, rol, acceso_pedidos, acceso_inventario, acceso_tickets)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ''', ("admin", "admin123", "admin", 1, 1, 1))
+            INSERT INTO usuarios (usuario, password, rol, acceso_floristeria, acceso_inventario, acceso_pedidos, acceso_saldo, acceso_status, acceso_tickets)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', ("admin", "admin123", "admin", 1, 1, 1, 1, 1, 1))
 
     conn.commit()
     conn.close()
@@ -58,7 +60,7 @@ def iniciar_sesion():
 
 # Función para mostrar la pantalla de acceso a módulos
 def mostrar_menu_principal(usuario_logueado):
-    id_usuario, usuario, password, rol, acceso_pedidos, acceso_inventario, acceso_tickets = usuario_logueado
+    id_usuario, usuario, password, rol, acceso_floristeria,  acceso_inventario, acceso_pedidos, acceso_saldo, acceso_status, acceso_tickets = usuario_logueado
 
     # Ocultar la pantalla de inicio de sesión
     login_window.withdraw()
@@ -78,10 +80,16 @@ def mostrar_menu_principal(usuario_logueado):
 
     tk.Label(menu_window, text=f"Bienvenido, {usuario} ({rol})", bg="#f0f0f0", font=("Arial", 12, "bold")).pack(pady=10)
 
-    if acceso_pedidos:
-        tk.Button(menu_window, text="Módulo de Pedidos", command=lambda: abrir_modulo("modulo_pedidos.py"), width=20).pack(pady=5)
+    if acceso_floristeria:
+        tk.Button(menu_window, text="Floristeria", command=lambda: abrir_modulo("floristeria.py"), width=20).pack(pady=5)
     if acceso_inventario:
         tk.Button(menu_window, text="Módulo de Inventario", command=lambda: abrir_modulo("modulo_inventario.py"), width=20).pack(pady=5)
+    if acceso_pedidos:
+        tk.Button(menu_window, text="Módulo de Pedidos", command=lambda: abrir_modulo("modulo_pedidos.py"), width=20).pack(pady=5)
+    if acceso_saldo:
+        tk.Button(menu_window, text="Módulo de Saldo", command=lambda: abrir_modulo("modulo_saldo.py"), width=20).pack(pady=5)
+    if acceso_status:
+        tk.Button(menu_window, text="Módulo de Status", command=lambda: abrir_modulo("modulo_status.py"), width=20).pack(pady=5)
     if acceso_tickets:
         tk.Button(menu_window, text="Módulo de Tickets", command=lambda: abrir_modulo("modulo_tickets.py"), width=20).pack(pady=5)
 

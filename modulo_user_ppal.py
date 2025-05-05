@@ -7,7 +7,7 @@ import subprocess  # Para ejecutar el módulo externo
 def crear_base_datos():
     conn = sqlite3.connect('usuarios.db')
     cursor = conn.cursor()
-    
+
     # Tabla de usuarios
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS usuarios (
@@ -15,20 +15,23 @@ def crear_base_datos():
             usuario TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
             rol TEXT NOT NULL,  -- "admin" o "usuario"
-            acceso_pedidos INTEGER DEFAULT 0,  -- 1 = acceso permitido, 0 = acceso denegado
+            acceso_floristeria INTEGER DEFAULT 0, -- 1 = acceso permitido, 0 = acceso denegado
             acceso_inventario INTEGER DEFAULT 0,
+            acceso_pedidos INTEGER DEFAULT 0,
+            acceso_saldo INTEGER DEFAULT 0,
+            acceso_status INTEGER DEFAULT 0,
             acceso_tickets INTEGER DEFAULT 0
         )
     ''')
-    
+
     # Crear usuario administrador por defecto si no existe
     cursor.execute('SELECT * FROM usuarios WHERE usuario = "admin"')
     if not cursor.fetchone():
         cursor.execute('''
-            INSERT INTO usuarios (usuario, password, rol, acceso_pedidos, acceso_inventario, acceso_tickets)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ''', ("admin", "admin123", "admin", 1, 1, 1))
-    
+            INSERT INTO usuarios (usuario, password, rol, acceso_floristeria, acceso_inventario, acceso_pedidos, acceso_saldo, acceso_status, acceso_tickets)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', ("admin", "admin123", "admin", 1, 1, 1, 1, 1, 1))
+
     conn.commit()
     conn.close()
 
@@ -48,21 +51,24 @@ def registrar_usuario():
     usuario = entry_usuario.get()
     password = entry_password.get()
     rol = combo_rol.get()
-    acceso_pedidos = var_acceso_pedidos.get()
+    acceso_floristeria = var_acceso_floristeria.get()
     acceso_inventario = var_acceso_inventario.get()
+    acceso_pedidos = var_acceso_pedidos.get()
+    acceso_saldo = var_acceso_saldo.get()
+    acceso_status = var_acceso_status.get()
     acceso_tickets = var_acceso_tickets.get()
-    
+
     if not usuario or not password or not rol:
         messagebox.showwarning("Advertencia", "Todos los campos son obligatorios.")
         return
-    
+
     try:
         conn = sqlite3.connect('usuarios.db')
         cursor = conn.cursor()
         cursor.execute('''
-            INSERT INTO usuarios (usuario, password, rol, acceso_pedidos, acceso_inventario, acceso_tickets)
-            VALUES (?, ?, ?, ?, ?, ?)
-        ''', (usuario, password, rol, acceso_pedidos, acceso_inventario, acceso_tickets))
+            INSERT INTO usuarios (usuario, password, rol, acceso_floristeria, acceso_inventario, acceso_pedidos, acceso_saldo, acceso_status, acceso_tickets)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', (usuario, password, rol, acceso_floristeria, acceso_inventario, acceso_pedidos, acceso_saldo, acceso_status, acceso_tickets))
         conn.commit()
         conn.close()
         cargar_usuarios()
@@ -77,27 +83,30 @@ def modificar_usuario():
     if not seleccion:
         messagebox.showwarning("Advertencia", "Seleccione un usuario para modificar.")
         return
-    
+
     item_id = tree_usuarios.item(seleccion)["values"][0]
     usuario = entry_usuario.get()
     password = entry_password.get()
     rol = combo_rol.get()
-    acceso_pedidos = var_acceso_pedidos.get()
+    acceso_floristeria = var_acceso_floristeria.get()
     acceso_inventario = var_acceso_inventario.get()
+    acceso_pedidos = var_acceso_pedidos.get()
+    acceso_saldo = var_acceso_saldo.get()
+    acceso_status = var_acceso_status.get()
     acceso_tickets = var_acceso_tickets.get()
-    
+
     if not usuario or not password or not rol:
         messagebox.showwarning("Advertencia", "Todos los campos son obligatorios.")
         return
-    
+
     try:
         conn = sqlite3.connect('usuarios.db')
         cursor = conn.cursor()
         cursor.execute('''
-            UPDATE usuarios 
-            SET usuario = ?, password = ?, rol = ?, acceso_pedidos = ?, acceso_inventario = ?, acceso_tickets = ?
+            UPDATE usuarios
+            SET usuario = ?, password = ?, rol = ?, acceso_floristeria = ?, acceso_inventario = ?, acceso_pedidos = ?, acceso_saldo = ?, acceso_status = ?, acceso_tickets = ?
             WHERE id = ?
-        ''', (usuario, password, rol, acceso_pedidos, acceso_inventario, acceso_tickets, item_id))
+        ''', (usuario, password, rol, acceso_floristeria, acceso_inventario, acceso_pedidos, acceso_saldo, acceso_status, acceso_tickets))
         conn.commit()
         conn.close()
         cargar_usuarios()
@@ -128,33 +137,36 @@ def eliminar_usuario():
 
 # Función para abrir el menu de la floristeria
 def abrir_menu_floristeria():
-  try:
-    # Ejecutar el script menu.py
-    subprocess.run(["python3", "./menu_floristeria.py"], check=True)
-  except FileNotFoundError:
-    messagebox.showerror("Error", "No se encontró el archivo menu_floristeria.py.")
-  except subprocess.CalledProcessError as e:
-    messagebox.showerror("Error", f"Ocurrió un error al ejecutar menu_floristeria.py: {e}")
+    try:
+        # Ejecutar el script menu.py
+        subprocess.run(["python3", "./menu_floristeria.py"], check=True)
+    except FileNotFoundError:
+        messagebox.showerror("Error", "No se encontró el archivo menu_floristeria.py.")
+    except subprocess.CalledProcessError as e:
+        messagebox.showerror("Error", f"Ocurrió un error al ejecutar menu_floristeria.py: {e}")
 
 # Función para cargar los datos de un usuario seleccionado en la forma
 def cargar_datos_usuario(event):
     seleccion = tree_usuarios.selection()
     if not seleccion:
         return
-    
+
     # Obtener los datos del usuario seleccionado
     datos_usuario = tree_usuarios.item(seleccion)["values"]
-    id_usuario, usuario, password, rol, acceso_pedidos, acceso_inventario, acceso_tickets = datos_usuario
-    
+    id_usuario, usuario, password, rol, acceso_floristeria, acceso_inventario, acceso_pedidos, acceso_saldo, acceso_status, acceso_tickets = datos_usuario
+
     # Limpiar los campos antes de cargar los datos
     limpiar_campos()
-    
+
     # Cargar los datos en los campos correspondientes
     entry_usuario.insert(0, usuario)
     entry_password.insert(0, password)
     combo_rol.set(rol)
-    var_acceso_pedidos.set(acceso_pedidos)
+    var_acceso_floristeria.set(acceso_floristeria)
     var_acceso_inventario.set(acceso_inventario)
+    var_acceso_pedidos.set(acceso_pedidos)
+    var_acceso_saldo.set(acceso_saldo)
+    var_acceso_status.set(acceso_status)
     var_acceso_tickets.set(acceso_tickets)
 
 # Función para limpiar los campos de entrada
@@ -162,14 +174,17 @@ def limpiar_campos():
     entry_usuario.delete(0, tk.END)
     entry_password.delete(0, tk.END)
     combo_rol.set("")
-    var_acceso_pedidos.set(0)
+    var_acceso_floristeria.set(0)
     var_acceso_inventario.set(0)
+    var_acceso_pedidos.set(0)
+    var_acceso_saldo.set(0)
+    var_acceso_status.set(0)
     var_acceso_tickets.set(0)
 
 # Configuración de la interfaz gráfica
 root = tk.Tk()
 root.title("Administración de Usuarios - Floristería")
-root.geometry("900x600")
+root.geometry("1250x600")
 root.configure(bg="#f0f0f0")  # Fondo claro
 
 # Crear la base de datos
@@ -189,16 +204,22 @@ combo_rol = ttk.Combobox(root, values=["admin", "usuario"], state="readonly", wi
 combo_rol.grid(row=2, column=1, padx=10, pady=5, sticky="w")
 
 tk.Label(root, text="Acceso a Módulos:", bg="#f0f0f0", font=("Arial", 10, "bold")).grid(row=3, column=0, padx=10, pady=5, sticky="w")
-var_acceso_pedidos = tk.IntVar()
+var_acceso_floristeria = tk.IntVar()
 var_acceso_inventario = tk.IntVar()
+var_acceso_pedidos = tk.IntVar()
+var_acceso_saldo = tk.IntVar()
+var_acceso_status = tk.IntVar()
 var_acceso_tickets = tk.IntVar()
-tk.Checkbutton(root, text="Pedidos", variable=var_acceso_pedidos, bg="#f0f0f0").grid(row=3, column=1, sticky="w")
-tk.Checkbutton(root, text="Inventario", variable=var_acceso_inventario, bg="#f0f0f0").grid(row=4, column=1, sticky="w")
-tk.Checkbutton(root, text="Tickets", variable=var_acceso_tickets, bg="#f0f0f0").grid(row=5, column=1, sticky="w")
+tk.Checkbutton(root, text="Floristeria", variable=var_acceso_floristeria, bg="#f0f0f0").grid(row=4, column=1, sticky="w")
+tk.Checkbutton(root, text="Inventario", variable=var_acceso_inventario, bg="#f0f0f0").grid(row=5, column=1, sticky="w")
+tk.Checkbutton(root, text="Pedidos", variable=var_acceso_pedidos, bg="#f0f0f0").grid(row=6, column=1, sticky="w")
+tk.Checkbutton(root, text="Saldo", variable=var_acceso_saldo, bg="#f0f0f0").grid(row=7, column=1, sticky="w")
+tk.Checkbutton(root, text="Status", variable=var_acceso_status, bg="#f0f0f0").grid(row=8, column=1, sticky="w")
+tk.Checkbutton(root, text="Tickets", variable=var_acceso_tickets, bg="#f0f0f0").grid(row=9, column=1, sticky="w")
 
 # Botones para gestionar usuarios
 frame_botones = tk.Frame(root, bg="#f0f0f0")
-frame_botones.grid(row=6, column=0, columnspan=2, pady=10)
+frame_botones.grid(row=10, column=0, columnspan=2, pady=10)
 
 btn_registrar = ttk.Button(frame_botones, text="Registrar Usuario", command=registrar_usuario)
 btn_registrar.grid(row=0, column=0, padx=5)
@@ -213,16 +234,16 @@ btn_eliminar = ttk.Button(frame_botones, text="Ir al Menu de Floristeria", comma
 btn_eliminar.grid(row=0, column=3, padx=5)
 
 # Tabla de usuarios
-columns = ("ID", "Usuario", "Contraseña", "Rol", "Acceso Pedidos", "Acceso Inventario", "Acceso Tickets")
+columns = ("ID", "Usuario", "Contraseña", "Rol", "Acceso Floristeria", "Acceso Inventario", "Acceso Pedidos", "Acceso Saldo", "Acceso Status", "Acceso Tickets")
 tree_usuarios = ttk.Treeview(root, columns=columns, show="headings", height=10)
 for col in columns:
     tree_usuarios.heading(col, text=col)
     tree_usuarios.column(col, width=120, anchor="center")
-tree_usuarios.grid(row=7, column=0, columnspan=2, padx=10, pady=10)
+tree_usuarios.grid(row=11, column=0, columnspan=2, padx=10, pady=10)
 
 # Scrollbar para la tabla
 scrollbar = ttk.Scrollbar(root, orient="vertical", command=tree_usuarios.yview)
-scrollbar.grid(row=7, column=2, sticky="ns")
+scrollbar.grid(row=11, column=2, sticky="ns")
 tree_usuarios.configure(yscrollcommand=scrollbar.set)
 
 # Asociar el evento de selección de usuario con la función `cargar_datos_usuario`
