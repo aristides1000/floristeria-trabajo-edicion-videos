@@ -1,6 +1,13 @@
 import tkinter as tk
 from tkinter import ttk, messagebox, filedialog
 import subprocess  # Para ejecutar el módulo externo
+from dotenv import load_dotenv # para ejecutar las variables de ambiente
+import os
+
+load_dotenv()  # Carga las variables desde .env
+
+# Acceder a las variables .env
+python_command = os.getenv("PYTHON_COMMAND")
 
 # Configuración de la ventana principal
 root = tk.Tk()
@@ -31,7 +38,7 @@ canvas.create_window((0, 0), window=main_frame, anchor="nw")
 def abrir_floristeria():
   try:
     # Ejecutar el script floristeria.py
-    subprocess.run(["python3", "./floristeria.py"], check=True)
+    subprocess.run([f"{python_command}", "./floristeria.py"], check=True)
   except FileNotFoundError:
     messagebox.showerror("Error", "No se encontró el archivo floristeria.py.")
   except subprocess.CalledProcessError as e:
@@ -41,7 +48,7 @@ def abrir_floristeria():
 def abrir_modulo_inventario():
   try:
     # Ejecutar el script modulo_inventario.py
-    subprocess.run(["python3", "./modulo_inventario.py"], check=True)
+    subprocess.run([f"{python_command}", "./modulo_inventario.py"], check=True)
   except FileNotFoundError:
     messagebox.showerror("Error", "No se encontró el archivo modulo_inventario.py.")
   except subprocess.CalledProcessError as e:
@@ -51,7 +58,7 @@ def abrir_modulo_inventario():
 def abrir_modulo_pedidos():
   try:
     # Ejecutar el script modulo_status.py
-    subprocess.run(["python3", "./modulo_pedidos.py"], check=True)
+    subprocess.run([f"{python_command}", "./modulo_pedidos.py"], check=True)
   except FileNotFoundError:
     messagebox.showerror("Error", "No se encontró el archivo modulo_pedidos.py.")
   except subprocess.CalledProcessError as e:
@@ -61,7 +68,7 @@ def abrir_modulo_pedidos():
 def abrir_modulo_saldo():
   try:
     # Ejecutar el script modulo_saldo.py
-    subprocess.run(["python3", "./modulo_saldo.py"], check=True)
+    subprocess.run([f"{python_command}", "./modulo_saldo.py"], check=True)
   except FileNotFoundError:
     messagebox.showerror("Error", "No se encontró el archivo modulo_saldo.py.")
   except subprocess.CalledProcessError as e:
@@ -71,7 +78,7 @@ def abrir_modulo_saldo():
 def abrir_modulo_status():
   try:
     # Ejecutar el script modulo_status.py
-    subprocess.run(["python3", "./modulo_status.py"], check=True)
+    subprocess.run([f"{python_command}", "./modulo_status.py"], check=True)
   except FileNotFoundError:
     messagebox.showerror("Error", "No se encontró el archivo modulo_status.py.")
   except subprocess.CalledProcessError as e:
@@ -81,7 +88,7 @@ def abrir_modulo_status():
 def abrir_modulo_tickets():
   try:
     # Ejecutar el script Modulo_tickets.py
-    subprocess.run(["python3", "./modulo_tickets.py"], check=True)
+    subprocess.run([f"{python_command}", "./modulo_tickets.py"], check=True)
   except FileNotFoundError:
     messagebox.showerror("Error", "No se encontró el archivo modulo_tickets.py.")
   except subprocess.CalledProcessError as e:

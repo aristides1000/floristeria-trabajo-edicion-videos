@@ -2,6 +2,13 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import sqlite3
 import subprocess  # Para ejecutar el módulo externo
+from dotenv import load_dotenv # para ejecutar las variables de ambiente
+import os  # Para manejar rutas de archivos
+
+load_dotenv()  # Carga las variables desde .env
+
+# Acceder a las variables .env
+python_command = os.getenv("PYTHON_COMMAND")
 
 # Crear la base de datos SQLite
 def crear_base_datos():
@@ -139,7 +146,7 @@ def eliminar_usuario():
 def abrir_menu_floristeria():
     try:
         # Ejecutar el script menu.py
-        subprocess.run(["python3", "./menu_floristeria.py"], check=True)
+        subprocess.run([f"{python_command}", "./menu_floristeria.py"], check=True)
     except FileNotFoundError:
         messagebox.showerror("Error", "No se encontró el archivo menu_floristeria.py.")
     except subprocess.CalledProcessError as e:

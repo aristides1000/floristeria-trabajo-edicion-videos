@@ -5,6 +5,13 @@ from tkcalendar import DateEntry
 from datetime import datetime
 import csv
 import subprocess  # Para ejecutar el módulo externo
+from dotenv import load_dotenv # para ejecutar las variables de ambiente
+import os  # Para manejar rutas de archivos
+
+load_dotenv()  # Carga las variables desde .env
+
+# Acceder a las variables .env
+python_command = os.getenv("PYTHON_COMMAND")
 
 # Función para conectar a la base de datos
 def conectar_db():
@@ -498,7 +505,7 @@ def abrir_gestion_modelos():
 def abrir_modulo_tickets():
     try:
         # Ejecutar el script Modulo_tickets.py
-        subprocess.run(["python3", "./modulo_tickets.py"], check=True)
+        subprocess.run([f"{python_command}", "./modulo_tickets.py"], check=True)
     except FileNotFoundError:
         messagebox.showerror("Error", "No se encontró el archivo modulo_tickets.py.")
     except subprocess.CalledProcessError as e:

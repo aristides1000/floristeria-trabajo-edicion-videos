@@ -2,7 +2,13 @@ import tkinter as tk
 from tkinter import ttk, messagebox
 import sqlite3
 import subprocess  # Para ejecutar scripts externos
+from dotenv import load_dotenv # para ejecutar las variables de ambiente
 import os  # Para manejar rutas de archivos
+
+load_dotenv()  # Carga las variables desde .env
+
+# Acceder a las variables .env
+python_command = os.getenv("PYTHON_COMMAND")
 
 # Crear la base de datos SQLite
 def crear_base_datos():
@@ -104,7 +110,7 @@ def abrir_modulo(modulo):
             return
 
         # Ejecutar el script externo usando subprocess
-        subprocess.Popen(["python", modulo])
+        subprocess.Popen([f"{python_command}", modulo])
     except Exception as e:
         messagebox.showerror("Error", f"Ocurrió un error al abrir el módulo: {e}")
 
