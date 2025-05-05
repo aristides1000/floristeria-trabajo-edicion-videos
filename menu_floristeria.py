@@ -5,7 +5,7 @@ import subprocess  # Para ejecutar el módulo externo
 # Configuración de la ventana principal
 root = tk.Tk()
 root.title("Menu - Floristería")
-root.geometry("320x219")  # Tamaño inicial de la ventana
+root.geometry("250x210")  # Tamaño inicial de la ventana
 root.resizable(True, True)
 
 # Estilo personalizado
@@ -37,45 +37,45 @@ def abrir_floristeria():
   except subprocess.CalledProcessError as e:
     messagebox.showerror("Error", f"Ocurrió un error al ejecutar floristeria.py: {e}")
 
-# Función para abrir el modulo_dinero_rango_fechas.py
-def abrir_modulo_dinero_rango_fechas():
-  try:
-    # Ejecutar el script modulo_dinero_rango_fechas.py
-    subprocess.run(["python3", "./modulo_dinero_rango_fechas.py"], check=True)
-  except FileNotFoundError:
-    messagebox.showerror("Error", "No se encontró el archivo modulo_dinero_rango_fechas.py.")
-  except subprocess.CalledProcessError as e:
-    messagebox.showerror("Error", f"Ocurrió un error al ejecutar modulo_dinero_rango_fechas.py: {e}")
-
 # Función para abrir el modulo_inventario.py
-def abrir_modulo_inventario_v3():
+def abrir_modulo_inventario():
   try:
     # Ejecutar el script modulo_inventario.py
-    subprocess.run(["python3", "./modulo_inventario_v3.py"], check=True)
+    subprocess.run(["python3", "./modulo_inventario.py"], check=True)
   except FileNotFoundError:
-    messagebox.showerror("Error", "No se encontró el archivo modulo_inventario_v3.py.")
+    messagebox.showerror("Error", "No se encontró el archivo modulo_inventario.py.")
   except subprocess.CalledProcessError as e:
-    messagebox.showerror("Error", f"Ocurrió un error al ejecutar modulo_inventario_v3.py: {e}")
-
-# Función para abrir el modulo_pantalla_status_v1.py
-def abrir_modulo_pantalla_status_v1():
-  try:
-    # Ejecutar el script modulo_pantalla_status_v1.py
-    subprocess.run(["python3", "./modulo_pantalla_status_v1.py"], check=True)
-  except FileNotFoundError:
-    messagebox.showerror("Error", "No se encontró el archivo modulo_pantalla_status_v1.py.")
-  except subprocess.CalledProcessError as e:
-    messagebox.showerror("Error", f"Ocurrió un error al ejecutar modulo_pantalla_status_v1.py: {e}")
+    messagebox.showerror("Error", f"Ocurrió un error al ejecutar modulo_inventario.py: {e}")
 
 # Función para abrir el modulo_pedidos.py
 def abrir_modulo_pedidos():
   try:
-    # Ejecutar el script modulo_pantalla_status_v1.py
+    # Ejecutar el script modulo_status.py
     subprocess.run(["python3", "./modulo_pedidos.py"], check=True)
   except FileNotFoundError:
     messagebox.showerror("Error", "No se encontró el archivo modulo_pedidos.py.")
   except subprocess.CalledProcessError as e:
     messagebox.showerror("Error", f"Ocurrió un error al ejecutar modulo_pedidos.py: {e}")
+
+# Función para abrir el modulo_saldo.py
+def abrir_modulo_saldo():
+  try:
+    # Ejecutar el script modulo_saldo.py
+    subprocess.run(["python3", "./modulo_saldo.py"], check=True)
+  except FileNotFoundError:
+    messagebox.showerror("Error", "No se encontró el archivo modulo_saldo.py.")
+  except subprocess.CalledProcessError as e:
+    messagebox.showerror("Error", f"Ocurrió un error al ejecutar modulo_saldo.py: {e}")
+
+# Función para abrir el modulo_status.py
+def abrir_modulo_status():
+  try:
+    # Ejecutar el script modulo_status.py
+    subprocess.run(["python3", "./modulo_status.py"], check=True)
+  except FileNotFoundError:
+    messagebox.showerror("Error", "No se encontró el archivo modulo_status.py.")
+  except subprocess.CalledProcessError as e:
+    messagebox.showerror("Error", f"Ocurrió un error al ejecutar modulo_status.py: {e}")
 
 # Función para abrir el módulo de tickets
 def abrir_modulo_tickets():
@@ -90,12 +90,12 @@ def abrir_modulo_tickets():
 # Botones
 btn_frame = ttk.Frame(main_frame)
 btn_frame.pack(fill="x", pady=10)
-ttk.Label(btn_frame, text="Menu de la Floristeria", font=("Arial", 20, "bold")).grid(row=0, column=0, padx=5, pady=5, sticky="w", columnspan=2)
+ttk.Label(btn_frame, text="Menu de la Floristeria", font=("Arial", 15, "bold")).grid(row=0, column=0, padx=5, pady=5, sticky="w", columnspan=2)
 ttk.Button(btn_frame, text="Abrir Floristeria", command=abrir_floristeria).grid(row=1, column=0, padx=5, pady=5, sticky="w")
-ttk.Button(btn_frame, text="Abrir Dinero Rango Fechas", command=abrir_modulo_dinero_rango_fechas).grid(row=1, column=1, padx=5, pady=5, sticky="w")
-ttk.Button(btn_frame, text="Abrir Inventario", command=abrir_modulo_inventario_v3).grid(row=2, column=0, padx=5, pady=5, sticky="w")
-ttk.Button(btn_frame, text="Abrir pantalla de status", command=abrir_modulo_pantalla_status_v1).grid(row=2, column=1, padx=5, pady=5, sticky="w")
-ttk.Button(btn_frame, text="Abrir pedidos", command=abrir_modulo_pedidos).grid(row=3, column=0, padx=5, pady=5, sticky="w")
+ttk.Button(btn_frame, text="Abrir Inventario", command=abrir_modulo_inventario).grid(row=2, column=0, padx=5, pady=5, sticky="w")
+ttk.Button(btn_frame, text="Abrir Pedidos", command=abrir_modulo_pedidos).grid(row=3, column=0, padx=5, pady=5, sticky="w")
+ttk.Button(btn_frame, text="Abrir Saldo", command=abrir_modulo_saldo).grid(row=1, column=1, padx=5, pady=5, sticky="w")
+ttk.Button(btn_frame, text="Abrir Status", command=abrir_modulo_status).grid(row=2, column=1, padx=5, pady=5, sticky="w")
 ttk.Button(btn_frame, text="Abrir Tickets", command=abrir_modulo_tickets).grid(row=3, column=1, padx=5, pady=5, sticky="w")
 
 # Ejecutar la aplicación

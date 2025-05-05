@@ -16,7 +16,8 @@ def crear_base_datos():
             usuario TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL,
             rol TEXT NOT NULL,  -- "admin" o "usuario"
-            acceso_pedidos INTEGER DEFAULT 0,  -- 1 = acceso permitido, 0 = acceso denegado
+            acceso_floristeria INTEGER DEFAULT 0, -- 1 = acceso permitido, 0 = acceso denegado
+            acceso_pedidos INTEGER DEFAULT 0,
             acceso_inventario INTEGER DEFAULT 0,
             acceso_tickets INTEGER DEFAULT 0
         )
@@ -80,7 +81,7 @@ def mostrar_menu_principal(usuario_logueado):
     if acceso_pedidos:
         tk.Button(menu_window, text="Módulo de Pedidos", command=lambda: abrir_modulo("modulo_pedidos.py"), width=20).pack(pady=5)
     if acceso_inventario:
-        tk.Button(menu_window, text="Módulo de Inventario", command=lambda: abrir_modulo("modulo_inventario_v3.py"), width=20).pack(pady=5)
+        tk.Button(menu_window, text="Módulo de Inventario", command=lambda: abrir_modulo("modulo_inventario.py"), width=20).pack(pady=5)
     if acceso_tickets:
         tk.Button(menu_window, text="Módulo de Tickets", command=lambda: abrir_modulo("modulo_tickets.py"), width=20).pack(pady=5)
 
