@@ -183,7 +183,7 @@ def limpiar_campos():
 # Configuración de la interfaz gráfica
 root = tk.Tk()
 root.title("Control de Inventario - Floristería")
-root.geometry("1200x800")
+root.geometry("1250x850")
 root.configure(bg="#f0f0f0")
 
 # Variables para los widgets del inventario
@@ -206,50 +206,50 @@ ttk.Label(root, text="Nombre", anchor="w").grid(row=0, column=0, padx=5, pady=5,
 entry_nombre = ttk.Entry(root, width=40)
 entry_nombre.grid(row=0, column=1, padx=5, pady=5, sticky="w")
 
-tk.Label(root, text="Tipo:", bg="#f0f0f0", font=("Arial", 10, "bold")).grid(row=0, column=0, padx=10, pady=5, sticky="w")
+tk.Label(root, text="Tipo:", bg="#f0f0f0", font=("Arial", 10, "bold")).grid(row=1, column=0, padx=10, pady=5, sticky="w")
 combo_tipo = ttk.Combobox(root, values=["Rosas", "Flores", "Extras"], state="readonly", width=20)
-combo_tipo.grid(row=0, column=1, padx=10, pady=5, sticky="w")
+combo_tipo.grid(row=1, column=1, padx=10, pady=5, sticky="w")
 
 tk.Label(root, text="Cantidad:", bg="#f0f0f0", font=("Arial", 10, "bold")).grid(row=2, column=0, padx=10, pady=5, sticky="w")
 entry_cantidad = tk.Entry(root, width=20, font=("Arial", 10))
 entry_cantidad.grid(row=2, column=1, padx=10, pady=5, sticky="w")
 
-ttk.Label(root, text="Unidad", anchor="w").grid(row=0, column=6, padx=5, pady=5, sticky="w")
+ttk.Label(root, text="Unidad", anchor="w").grid(row=3, column=0, padx=5, pady=5, sticky="w")
 unidad_var = tk.StringVar()
 unidad_combobox = ttk.Combobox(root, textvariable=unidad_var, values=["Docena", "Unidad"], state="readonly")
-unidad_combobox.grid(row=0, column=7, padx=5, pady=5, sticky="w")
+unidad_combobox.grid(row=3, column=1, padx=5, pady=5, sticky="w")
 
-ttk.Label(root, text="Fecha de Carga", anchor="w").grid(row=1, column=2, padx=5, pady=5, sticky="w")
+ttk.Label(root, text="Fecha de Carga", anchor="w").grid(row=4, column=0, padx=5, pady=5, sticky="w")
 entry_fecha_carga = DateEntry(root, date_pattern='yyyy-MM-dd', state="readonly")  # Fecha de carga
-entry_fecha_carga.grid(row=1, column=3, padx=5, pady=5, sticky="w")
+entry_fecha_carga.grid(row=4, column=1, padx=5, pady=5, sticky="w")
 
 """ tk.Label(root, text="Fecha:", bg="#f0f0f0", font=("Arial", 10, "bold")).grid(row=4, column=0, padx=10, pady=5, sticky="w")
 entry_fecha = DateEntry(root, date_pattern="yyyy-mm-dd", width=18, font=("Arial", 10))
 entry_fecha.grid(row=4, column=1, padx=10, pady=5, sticky="w") """
 
-ttk.Label(root, text="Precio de Costo", anchor="w").grid(row=1, column=0, padx=5, pady=5, sticky="w")
+ttk.Label(root, text="Precio de Costo", anchor="w").grid(row=5, column=0, padx=5, pady=5, sticky="w")
 entry_precio_costo = ttk.Entry(root, width=10)
-entry_precio_costo.grid(row=1, column=1, padx=5, pady=5, sticky="w")
+entry_precio_costo.grid(row=5, column=1, padx=5, pady=5, sticky="w")
 
 """ tk.Label(root, text="Costo:", bg="#f0f0f0", font=("Arial", 10, "bold")).grid(row=3, column=0, padx=10, pady=5, sticky="w")
 entry_costo = tk.Entry(root, width=20, font=("Arial", 10))
 entry_costo.grid(row=3, column=1, padx=10, pady=5, sticky="w") """
 
-tk.Label(root, text="Descripción:", bg="#f0f0f0", font=("Arial", 10, "bold")).grid(row=1, column=0, padx=10, pady=5, sticky="w")
+tk.Label(root, text="Descripción:", bg="#f0f0f0", font=("Arial", 10, "bold")).grid(row=6, column=0, padx=10, pady=5, sticky="w")
 entry_descripcion = tk.Entry(root, width=60, font=("Arial", 10))  # Nuevo campo para descripción
-entry_descripcion.grid(row=1, column=1, padx=10, pady=5, sticky="w")
+entry_descripcion.grid(row=6, column=1, padx=10, pady=5, sticky="w")
 
 # Botones
 frame_botones = tk.Frame(root, bg="#f0f0f0")
-frame_botones.grid(row=5, column=0, columnspan=2, pady=10)
+frame_botones.grid(row=7, column=0, columnspan=2, pady=10)
 btn_agregar = ttk.Button(frame_botones, text="Agregar", command=agregar_item)
-btn_agregar.grid(row=0, column=0, padx=5)
+btn_agregar.grid(row=7, column=1, padx=5)
 btn_modificar = ttk.Button(frame_botones, text="Modificar", command=modificar_item)
-btn_modificar.grid(row=0, column=1, padx=5)
+btn_modificar.grid(row=7, column=2, padx=5)
 btn_eliminar = ttk.Button(frame_botones, text="Eliminar", command=eliminar_item)
-btn_eliminar.grid(row=0, column=2, padx=5)
+btn_eliminar.grid(row=7, column=3, padx=5)
 btn_actualizar = ttk.Button(root, text="Actualizar Inventario", command=actualizar_inventario)
-btn_actualizar.grid(row=6, column=0, columnspan=2, pady=10)
+btn_actualizar.grid(row=8, column=0, columnspan=2, pady=10)
 
 # Tabla de inventario
 columns = ("ID", "Nombre", "Tipo", "Cantidad", "Unidad", "Fecha de Carga", "Precio de Costo", "Descripción")
@@ -257,26 +257,26 @@ tree_inventario = ttk.Treeview(root, columns=columns, show="headings", height=10
 for col in columns:
     tree_inventario.heading(col, text=col)
     tree_inventario.column(col, width=150, anchor="center")
-tree_inventario.grid(row=7, column=0, columnspan=3, padx=10, pady=10)
+tree_inventario.grid(row=12, column=0, columnspan=3, padx=10, pady=10)
 
 # Scrollbar para la tabla
 scrollbar_inv = ttk.Scrollbar(root, orient="vertical", command=tree_inventario.yview)
-scrollbar_inv.grid(row=7, column=3, sticky="ns")
+scrollbar_inv.grid(row=12, column=3, sticky="ns")
 tree_inventario.configure(yscrollcommand=scrollbar_inv.set)
 
 # Consolidado
-tk.Label(root, text="Consolidado por Tipo", bg="#f0f0f0", font=("Arial", 12, "bold")).grid(row=8, column=0, columnspan=3, pady=10)
+tk.Label(root, text="Consolidado por Tipo", bg="#f0f0f0", font=("Arial", 12, "bold")).grid(row=14, column=0, columnspan=3, pady=10)
 columns_con = ("Tipo", "Total")
 tree_consolidado = ttk.Treeview(root, columns=columns_con, show="headings", height=5)
 tree_consolidado.heading("Tipo", text="Tipo")
 tree_consolidado.heading("Total", text="Total Disponible")
 tree_consolidado.column("Tipo", width=200)
 tree_consolidado.column("Total", width=200)
-tree_consolidado.grid(row=9, column=0, columnspan=3, padx=10, pady=5)
+tree_consolidado.grid(row=15, column=0, columnspan=3, padx=10, pady=5)
 
 # Botón refrescar consolidado
 btn_refrescar = ttk.Button(root, text="Refrescar Consolidado", command=cargar_consolidado)
-btn_refrescar.grid(row=10, column=0, columnspan=3, pady=10)
+btn_refrescar.grid(row=16, column=0, columnspan=3, pady=10)
 
 # Cargar datos iniciales
 cargar_inventario()
