@@ -1,6 +1,7 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
 import sqlite3
+import subprocess  # Para ejecutar el módulo externo
 
 # Crear la base de datos SQLite
 def crear_base_datos():
@@ -125,6 +126,16 @@ def eliminar_usuario():
         limpiar_campos()
         messagebox.showinfo("Éxito", "Usuario eliminado correctamente.")
 
+# Función para abrir el menu de la floristeria
+def abrir_menu_floristeria():
+  try:
+    # Ejecutar el script menu.py
+    subprocess.run(["python3", "./menu_floristeria.py"], check=True)
+  except FileNotFoundError:
+    messagebox.showerror("Error", "No se encontró el archivo menu_floristeria.py.")
+  except subprocess.CalledProcessError as e:
+    messagebox.showerror("Error", f"Ocurrió un error al ejecutar menu_floristeria.py: {e}")
+
 # Función para cargar los datos de un usuario seleccionado en la forma
 def cargar_datos_usuario(event):
     seleccion = tree_usuarios.selection()
@@ -197,6 +208,9 @@ btn_modificar.grid(row=0, column=1, padx=5)
 
 btn_eliminar = ttk.Button(frame_botones, text="Eliminar Usuario", command=eliminar_usuario)
 btn_eliminar.grid(row=0, column=2, padx=5)
+
+btn_eliminar = ttk.Button(frame_botones, text="Ir al Menu de Floristeria", command=abrir_menu_floristeria)
+btn_eliminar.grid(row=0, column=3, padx=5)
 
 # Tabla de usuarios
 columns = ("ID", "Usuario", "Contraseña", "Rol", "Acceso Pedidos", "Acceso Inventario", "Acceso Tickets")
