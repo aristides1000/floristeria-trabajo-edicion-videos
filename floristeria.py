@@ -17,7 +17,7 @@ def conectar_db():
                         cantidad INTEGER NOT NULL,
                         unidad TEXT NOT NULL,  -- 'Docena' o 'Unidad'
                         fecha_carga TEXT NOT NULL,  -- Fecha y hora de carga
-                        precio_costo REAL NOT NULL,  -- Precio de costo\
+                        precio_costo REAL NOT NULL,  -- Precio de costo
                         descripcion TEXT
                     )''')
 
