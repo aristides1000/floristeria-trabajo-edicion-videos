@@ -517,7 +517,7 @@ conectar_db()
 # Configuración de la ventana principal
 root = tk.Tk()
 root.title("Gestión de Pedidos - Floristería")
-root.geometry("900x600")  # Tamaño inicial de la ventana
+root.geometry("1750x1000")  # Tamaño inicial de la ventana
 root.resizable(True, True)
 
 # Estilo personalizado
