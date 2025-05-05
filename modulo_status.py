@@ -53,7 +53,7 @@ def actualizar_tabla():
 # Configuración de la ventana principal
 root = tk.Tk()
 root.title("Pedidos Pendientes - Floristería")
-root.geometry("800x400")  # Tamaño inicial de la ventana
+root.geometry("1000x800")  # Tamaño inicial de la ventana
 root.resizable(True, True)
 
 # Estilo personalizado
