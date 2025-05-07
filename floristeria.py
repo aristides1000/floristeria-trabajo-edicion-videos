@@ -193,7 +193,7 @@ conectar_db()
 # Configuración de la ventana principal
 root = tk.Tk()
 root.title("Gestión de Inventario - Floristería")
-root.geometry("800x600")  # Tamaño inicial de la ventana
+root.geometry("1200x600")  # Tamaño inicial de la ventana
 root.resizable(True, True)
 
 # Marco principal

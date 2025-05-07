@@ -168,7 +168,7 @@ def actualizar_delivery_persona(event):
 # Configuración de la interfaz gráfica
 root = tk.Tk()
 root.title("Gestión de Pedidos - Floristería")
-root.geometry("900x600")
+root.geometry("1150x600")
 root.configure(bg="#f0f0f0")  # Fondo claro
 
 # Estilo para los widgets
