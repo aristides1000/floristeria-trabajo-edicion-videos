@@ -1,0 +1,4 @@
+babel==2.17.0
+fpdf==1.7.2
+python-dotenv==1.1.0
+tkcalendar==1.6.1
