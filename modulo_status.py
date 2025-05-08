@@ -19,7 +19,7 @@ def conectar_db():
                         costo REAL,
                         fecha_hora_entrega TEXT,
                         enviado_a TEXT,
-                        nota TEXT,
+                        descripcion TEXT,
                         estado TEXT)''')
     conn.commit()
     conn.close()
@@ -29,7 +29,7 @@ def obtener_pedidos_pendientes():
     conn = sqlite3.connect("floristeria.db")
     cursor = conn.cursor()
     # Filtrar pedidos con estado "En Proceso" y ordenar por fecha y hora de entrega
-    cursor.execute("SELECT fecha_hora_entrega, cliente, telefono, enviado_a, nota, estado FROM pedidos WHERE estado = 'En Proceso' ORDER BY fecha_hora_entrega ASC")
+    cursor.execute("SELECT fecha_hora_entrega, cliente, telefono, enviado_a, descripcion, estado FROM pedidos WHERE estado = 'En Proceso' ORDER BY fecha_hora_entrega ASC")
     pedidos = cursor.fetchall()
     conn.close()
     return pedidos
@@ -77,12 +77,12 @@ tree_frame = ttk.Frame(main_frame)
 tree_frame.pack(fill="both", expand=True, pady=10)
 
 # Crear la tabla
-tree = ttk.Treeview(tree_frame, columns=("Fecha y Hora Entrega", "Cliente", "Teléfono", "Enviado a", "Nota", "Estado"), show="headings")
+tree = ttk.Treeview(tree_frame, columns=("Fecha y Hora Entrega", "Cliente", "Teléfono", "Enviado a", "Descripcion", "Estado"), show="headings")
 tree.heading("Fecha y Hora Entrega", text="Fecha y Hora Entrega")
 tree.heading("Cliente", text="Cliente")
 tree.heading("Teléfono", text="Teléfono")
 tree.heading("Enviado a", text="Enviado a")
-tree.heading("Nota", text="Nota")
+tree.heading("Descripcion", text="Descripcion")
 tree.heading("Estado", text="Estado")
 
 # Configurar el ancho de las columnas
@@ -90,7 +90,7 @@ tree.column("Fecha y Hora Entrega", width=150, anchor="center")
 tree.column("Cliente", width=150, anchor="w")
 tree.column("Teléfono", width=100, anchor="center")
 tree.column("Enviado a", width=150, anchor="w")
-tree.column("Nota", width=150, anchor="w")
+tree.column("Descripcion", width=150, anchor="w")
 tree.column("Estado", width=100, anchor="center")
 
 tree.pack(fill="both", expand=True)

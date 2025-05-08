@@ -21,7 +21,7 @@ def conectar_db():
                       costo REAL,
                       fecha_hora_entrega TEXT,
                       enviado_a TEXT,
-                      nota TEXT,
+                      descripcion TEXT,
                       costo_adicional REAL,
                       costo_total REAL,
                       estado TEXT)''')

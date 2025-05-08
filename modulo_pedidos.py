@@ -29,7 +29,7 @@ def conectar_db():
                         costo REAL,
                         fecha_hora_entrega TEXT,
                         enviado_a TEXT,
-                        nota TEXT,
+                        descripcion TEXT,
                         costo_adicional REAL,
                         costo_total REAL,
                         estado TEXT)''')
@@ -98,7 +98,7 @@ def agregar_pedido():
     fecha_hora = f"{entry_fecha.get()} {hora_var.get()}"
     fecha_hora_entrega = f"{entry_entrega.get()} {hora_entrega_var.get()}"
     enviado_a = entry_enviado_a.get()
-    nota = entry_nota.get()
+    descripcion = entry_descripcion.get()
     estado = estado_var.get()
     modelo_ramo = modelo_ramo_var.get()  # Obtener el modelo seleccionado
     # Validar campos obligatorios
@@ -126,9 +126,9 @@ def agregar_pedido():
     try:
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO pedidos (fecha_hora, cliente, telefono, direccion, forma_pago, modelo_ramo, costo, fecha_hora_entrega, enviado_a, nota, costo_adicional, costo_total, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        cursor.execute("INSERT INTO pedidos (fecha_hora, cliente, telefono, direccion, forma_pago, modelo_ramo, costo, fecha_hora_entrega, enviado_a, descripcion, costo_adicional, costo_total, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                        (fecha_hora, entry_cliente.get(), telefono_completo, entry_direccion.get(),
-                        forma_pago_var.get(), modelo_ramo, costo, fecha_hora_entrega, enviado_a, nota, costo_adicional, costo_total, estado))
+                        forma_pago_var.get(), modelo_ramo, costo, fecha_hora_entrega, enviado_a, descripcion, costo_adicional, costo_total, estado))
         conn.commit()
     except sqlite3.Error as e:
         messagebox.showerror("Error", f"Ocurrió un error al agregar el pedido: {e}")
@@ -150,7 +150,7 @@ def modificar_pedido():
     fecha_hora = f"{entry_fecha.get()} {hora_var.get()}"
     fecha_hora_entrega = f"{entry_entrega.get()} {hora_entrega_var.get()}"
     enviado_a = entry_enviado_a.get()
-    nota = entry_nota.get()
+    descripcion = entry_descripcion.get()
     estado = estado_var.get()
     modelo_ramo = modelo_ramo_var.get()  # Obtener el modelo seleccionado
     # Validar campos obligatorios
@@ -179,9 +179,9 @@ def modificar_pedido():
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
         pedido_id = tree.item(selected_item)['values'][0]
-        cursor.execute("UPDATE pedidos SET fecha_hora=?, cliente=?, telefono=?, direccion=?, forma_pago=?, modelo_ramo=?, costo=?, fecha_hora_entrega=?, enviado_a=?, nota=?, costo_adicional=? , costo_total=? , estado=? WHERE id=?",
+        cursor.execute("UPDATE pedidos SET fecha_hora=?, cliente=?, telefono=?, direccion=?, forma_pago=?, modelo_ramo=?, costo=?, fecha_hora_entrega=?, enviado_a=?, descripcion=?, costo_adicional=? , costo_total=? , estado=? WHERE id=?",
                        (fecha_hora, entry_cliente.get(), telefono_completo, entry_direccion.get(),
-                        forma_pago_var.get(), modelo_ramo, costo, fecha_hora_entrega, enviado_a, nota, costo_adicional, costo_total, estado, pedido_id))
+                        forma_pago_var.get(), modelo_ramo, costo, fecha_hora_entrega, enviado_a, descripcion, costo_adicional, costo_total, estado, pedido_id))
         conn.commit()
     except sqlite3.Error as e:
         messagebox.showerror("Error", f"Ocurrió un error al modificar el pedido: {e}")
@@ -222,15 +222,21 @@ def mostrar_pedidos():
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
         """ cursor.execute("SELECT * FROM pedidos") """
-        cursor.execute("SELECT id, fecha_hora, cliente, telefono, direccion, forma_pago, modelo_ramo, costo, fecha_hora_entrega, enviado_a, nota, costo_adicional, costo_total, estado FROM pedidos;")
+        cursor.execute("SELECT id, fecha_hora, cliente, telefono, direccion, forma_pago, modelo_ramo, costo, fecha_hora_entrega, enviado_a, descripcion, costo_adicional, costo_total, estado FROM pedidos;")
         rows = cursor.fetchall()
         # Definir tags para los colores de fondo
         tree.tag_configure("en_proceso", background="#33f6ff")  # azul claro
         tree.tag_configure("enviado", background="#90EE90")     # Verde claro
+        tree.tag_configure("armado", background="#f5ef42")      # amarillo
         for row in rows:
             # Determinar el tag según el estado del pedido
             estado = row[13]  # Última columna: estado
-            tag = "en_proceso" if estado == "En Proceso" else "enviado"
+            if (estado == "En Proceso"):
+                tag = "en_proceso"
+            elif (estado == "Enviado"):
+                tag = "enviado"
+            else:
+                tag = "armado"
             # Insertar la fila con el tag correspondiente
             tree.insert("", tk.END, values=row, tags=(tag,))
     except sqlite3.Error as e:
@@ -245,7 +251,7 @@ def cargar_pedido(event):
         pedido = tree.item(selected_item)['values']
         try:
             # Cargar datos en los campos del formulario SIN VALIDACIONES
-            entry_fecha.set_date(datetime.strptime(pedido[1].split()[0], "%Y-%m-%d").date())  # Fecha del pedido 
+            entry_fecha.set_date(datetime.strptime(pedido[1].split()[0], "%Y-%m-%d").date())  # Fecha del pedido
             hora_var.set(pedido[1].split()[1])  # Hora del pedido
             entry_cliente.delete(0, tk.END)
             entry_cliente.insert(0, pedido[2])  # Cliente
@@ -269,8 +275,8 @@ def cargar_pedido(event):
             hora_entrega_var.set(pedido[8].split()[1])  # Hora de entrega
             entry_enviado_a.delete(0, tk.END)
             entry_enviado_a.insert(0, pedido[9])  # Enviado a
-            entry_nota.delete(0, tk.END)
-            entry_nota.insert(0, pedido[10])
+            entry_descripcion.delete(0, tk.END)
+            entry_descripcion.insert(0, pedido[10])
             entry_costo_adicional.delete(0, tk.END)
             entry_costo_adicional.insert(0, pedido[11])  # Costo Adicional
             entry_costo_total.delete(0, tk.END)
@@ -293,7 +299,7 @@ def limpiar_campos():
     entry_entrega.set_date(datetime.now().date())  # Establecer la fecha actual
     hora_entrega_var.set("08:00")  # Establecer una hora predeterminada
     entry_enviado_a.delete(0, tk.END)
-    entry_nota.delete(0, tk.END)
+    entry_descripcion.delete(0, tk.END)
     entry_costo_adicional.delete(0, tk.END)
     entry_costo_total.delete(0, tk.END)
     estado_var.set("En Proceso")  # Estado predeterminado
@@ -303,7 +309,7 @@ def exportar_a_csv():
     try:
         with open("pedidos.csv", mode="w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
-            writer.writerow(["ID", "Fecha y Hora", "Cliente", "Teléfono", "Dirección", "Forma de Pago", "Modelo del Ramo", "Costo", "Fecha y Hora Entrega", "Enviado a", "Nota", "Costo Adicional", "Costo Total", "Estado"])
+            writer.writerow(["ID", "Fecha y Hora", "Cliente", "Teléfono", "Dirección", "Forma de Pago", "Modelo del Ramo", "Costo", "Fecha y Hora Entrega", "Enviado a", "Descripcion", "Costo Adicional", "Costo Total", "Estado"])
             for row in tree.get_children():
                 writer.writerow(tree.item(row)['values'])
         messagebox.showinfo("Éxito", "Datos exportados correctamente a pedidos.csv")
@@ -563,7 +569,7 @@ entry_costo = ttk.Entry(form_frame, width=20)
 entry_entrega = DateEntry(form_frame, date_pattern='yyyy-MM-dd')
 hora_entrega_var = tk.StringVar()
 entry_enviado_a = ttk.Entry(form_frame, width=40)
-entry_nota = ttk.Entry(form_frame, width=60)
+entry_descripcion = ttk.Entry(form_frame, width=60)
 entry_costo_adicional = ttk.Entry(form_frame, width=20)
 entry_costo_total = ttk.Entry(form_frame, width=20, state="disabled")
 estado_var = tk.StringVar()
@@ -572,7 +578,7 @@ estado_var = tk.StringVar()
 labels = [
     "Fecha del Pedido", "Hora del Pedido (HH:MM)", "Cliente",
     "Teléfono", "Forma de Pago", "Modelo del Ramo",
-    "Costo", "Fecha de Entrega", "Hora de Entrega (HH:MM)", "Enviado a", "Nota", "Costo Adicional"
+    "Costo", "Fecha de Entrega", "Hora de Entrega (HH:MM)", "Enviado a", "Descripcion", "Costo Adicional"
 ]
 row_index = 0  # Índice para controlar las filas
 for i, text in enumerate(labels):
@@ -629,10 +635,10 @@ for i, text in enumerate(labels):
         ttk.Label(form_frame, text=text, anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
         entry_enviado_a.grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
         row_index += 1
-    elif text == "Nota":
-        # Entrada para "Nota"
-        ttk.Label(form_frame, text="Nota", anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
-        entry_nota.grid(row=row_index, column=1, columnspan=3, padx=5, pady=5, sticky="ew")  # Expandir horizontalmente
+    elif text == "Descripcion":
+        # Entrada para "Descripcion"
+        ttk.Label(form_frame, text="Descripcion", anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
+        entry_descripcion.grid(row=row_index, column=1, columnspan=3, padx=5, pady=5, sticky="ew")  # Expandir horizontalmente
         row_index += 1
     else:
         # Entradas generales
@@ -649,7 +655,7 @@ for i, text in enumerate(labels):
 
 # Campo de estado
 ttk.Label(form_frame, text="Estado", anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
-estado_combobox = ttk.Combobox(form_frame, textvariable=estado_var, values=["En Proceso", "Enviado"], state="readonly", width=20)
+estado_combobox = ttk.Combobox(form_frame, textvariable=estado_var, values=["En Proceso", "Enviado", "Armado"], state="readonly", width=20)
 estado_combobox.grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
 estado_combobox.current(0)
 row_index += 1
@@ -682,7 +688,7 @@ ttk.Button(search_frame, text="Buscar", command=buscar_pedidos).pack(side="left"
 # Tabla de pedidos
 tree_frame = ttk.Frame(main_frame)
 tree_frame.pack(fill="both", expand=True, pady=10)
-tree = ttk.Treeview(tree_frame, columns=("ID", "Fecha y Hora", "Cliente", "Teléfono", "Dirección", "Forma de Pago", "Modelo del Ramo", "Costo", "Fecha y Hora Entrega", "Enviado a", "Nota", "Costo Adicional", "Costo Total", "Estado"), show="headings")
+tree = ttk.Treeview(tree_frame, columns=("ID", "Fecha y Hora", "Cliente", "Teléfono", "Dirección", "Forma de Pago", "Modelo del Ramo", "Costo", "Fecha y Hora Entrega", "Enviado a", "Descripcion", "Costo Adicional", "Costo Total", "Estado"), show="headings")
 for col in tree['columns']:
     tree.heading(col, text=col)
     tree.column(col, width=120, anchor="center")
