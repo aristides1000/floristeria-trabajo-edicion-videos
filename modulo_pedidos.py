@@ -91,6 +91,20 @@ def calcular_costo_acumulado():
     finally:
         conn.close()
 
+# Función para calcular el costo acumulado sin cuentas por cobrar
+def calcular_costo_acumulado_sin_cuentas_por_cobrar():
+    try:
+        conn = sqlite3.connect("floristeria.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT SUM(costo + costo_adicional) FROM pedidos WHERE forma_pago <> 'Por Cobrar'")
+        resultado = cursor.fetchone()[0]
+        costo_acumulado_cobrar = resultado if resultado else 0.0  # Si no hay pedidos, el costo es 0.0
+        costo_acumulado_cobrar_var.set(round(costo_acumulado_cobrar, 2))  # Actualizar la variable con el costo acumulado
+    except sqlite3.Error as e:
+        messagebox.showerror("Error", f"Ocurrió un error al calcular el costo acumulado sin costo acumulado sin cobrar: {e}")
+    finally:
+        conn.close()
+
 # Función para agregar un pedido
 def agregar_pedido():
     prefijo = prefijo_var.get()  # Obtener el prefijo seleccionado
@@ -137,6 +151,7 @@ def agregar_pedido():
     limpiar_campos()
     mostrar_pedidos()
     calcular_costo_acumulado()  # Calcular el costo acumulado después de agregar un pedido
+    calcular_costo_acumulado_sin_cuentas_por_cobrar() # Calcular el costo acumulado sin cuentas por cobrar después de agregar un pedido
     messagebox.showinfo("Éxito", "Pedido agregado correctamente.")
 
 # Función para modificar un pedido
@@ -190,6 +205,7 @@ def modificar_pedido():
     limpiar_campos()
     mostrar_pedidos()
     calcular_costo_acumulado()  # Calcular el costo acumulado después de modificar un pedido
+    calcular_costo_acumulado_sin_cuentas_por_cobrar() # Calcular el costo acumulado sin cuentas por cobrar después de agregar un pedido
     messagebox.showinfo("Éxito", "Pedido modificado correctamente.")
 
 # Función para eliminar un pedido
@@ -211,6 +227,7 @@ def eliminar_pedido():
     limpiar_campos()
     mostrar_pedidos()
     calcular_costo_acumulado()  # Calcular el costo acumulado después de eliminar un pedido
+    calcular_costo_acumulado_sin_cuentas_por_cobrar() # Calcular el costo acumulado sin cuentas por cobrar después de agregar un pedido
     messagebox.showinfo("Éxito", "Pedido eliminado correctamente.")
 
 # Función para mostrar los pedidos en la tabla
@@ -666,6 +683,12 @@ ttk.Label(form_frame, text="Costo Acumulado:", anchor="w").grid(row=row_index, c
 ttk.Label(form_frame, textvariable=costo_acumulado_var, anchor="w").grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
 row_index += 1
 
+# Campo para el costo acumulado sin cuentas por cobrar
+costo_acumulado_cobrar_var = tk.DoubleVar(value=0.0)
+ttk.Label(form_frame, text="Costo Acumulado sin cuentas por cobrar:", anchor="w").grid(row=row_index - 1, column=2, padx=5, pady=5, sticky="w")
+ttk.Label(form_frame, textvariable=costo_acumulado_cobrar_var, anchor="w").grid(row=row_index - 1, column=3, padx=5, pady=5, sticky="w")
+row_index += 1
+
 # Botones
 btn_frame = ttk.Frame(main_frame)
 btn_frame.pack(fill="x", pady=10)
@@ -705,6 +728,9 @@ cargar_modelos_ramos()
 
 # Calcular el costo acumulado inicial
 calcular_costo_acumulado()
+
+# Calcular el costo acumulado sin cuentas por cobrar inicial
+calcular_costo_acumulado_sin_cuentas_por_cobrar()
 
 # Ejecutar la aplicación
 root.mainloop()
