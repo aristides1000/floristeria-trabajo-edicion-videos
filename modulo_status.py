@@ -29,24 +29,36 @@ def obtener_pedidos_pendientes():
     conn = sqlite3.connect("floristeria.db")
     cursor = conn.cursor()
     # Filtrar pedidos con estado "En Proceso" y ordenar por fecha y hora de entrega
-    cursor.execute("SELECT fecha_hora_entrega, cliente, telefono, enviado_a, descripcion, estado FROM pedidos WHERE estado = 'En Proceso' ORDER BY fecha_hora_entrega ASC")
+    cursor.execute("SELECT id, fecha_hora_entrega AS dia, fecha_hora_entrega, descripcion FROM pedidos WHERE estado = 'En Proceso' ORDER BY fecha_hora_entrega ASC")
     pedidos = cursor.fetchall()
     conn.close()
-    return pedidos
+
+    days = ["Lunes", "Martes", "Miercoles", "Jueves", "Viernes", "Sabado", "Domingo"]
+
+    pedidos_modified = []
+
+    for pedido in pedidos:
+        pedido_list = list(pedido)
+        d = datetime.strptime(pedido_list[1], "%Y-%m-%d %H:%M")
+        pedido_list[1] = days[d.weekday()]
+        pedido = tuple(pedido_list)
+        pedidos_modified.append(pedido)
+
+    return pedidos_modified
 
 # Función para actualizar la tabla de pedidos pendientes
 def actualizar_tabla():
     # Limpiar la tabla antes de actualizar
     for row in tree.get_children():
         tree.delete(row)
-    
+
     # Obtener los pedidos pendientes
     pedidos = obtener_pedidos_pendientes()
-    
+
     # Insertar los datos en la tabla
     for pedido in pedidos:
         tree.insert("", tk.END, values=pedido)
-    
+
     # Programar la próxima actualización
     root.after(5000, actualizar_tabla)  # Actualizar cada 5 segundos (5000 ms)
 
@@ -77,21 +89,17 @@ tree_frame = ttk.Frame(main_frame)
 tree_frame.pack(fill="both", expand=True, pady=10)
 
 # Crear la tabla
-tree = ttk.Treeview(tree_frame, columns=("Fecha y Hora Entrega", "Cliente", "Teléfono", "Enviado a", "Descripcion", "Estado"), show="headings")
+tree = ttk.Treeview(tree_frame, columns=("Id", "Dia", "Fecha y Hora Entrega", "Descripcion"), show="headings")
+tree.heading("Id", text="Id")
+tree.heading("Dia", text="Dia")
 tree.heading("Fecha y Hora Entrega", text="Fecha y Hora Entrega")
-tree.heading("Cliente", text="Cliente")
-tree.heading("Teléfono", text="Teléfono")
-tree.heading("Enviado a", text="Enviado a")
 tree.heading("Descripcion", text="Descripcion")
-tree.heading("Estado", text="Estado")
 
 # Configurar el ancho de las columnas
-tree.column("Fecha y Hora Entrega", width=150, anchor="center")
-tree.column("Cliente", width=150, anchor="w")
-tree.column("Teléfono", width=100, anchor="center")
-tree.column("Enviado a", width=150, anchor="w")
-tree.column("Descripcion", width=150, anchor="w")
-tree.column("Estado", width=100, anchor="center")
+tree.column("Id", width=1, anchor="w")
+tree.column("Dia", width=10, anchor="center")
+tree.column("Fecha y Hora Entrega", width=10, anchor="center")
+tree.column("Descripcion", width=200, anchor="w")
 
 tree.pack(fill="both", expand=True)
 
