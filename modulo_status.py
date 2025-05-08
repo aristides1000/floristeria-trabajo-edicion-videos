@@ -31,7 +31,7 @@ def obtener_pedidos_pendientes():
     conn = sqlite3.connect("floristeria.db")
     cursor = conn.cursor()
     # Filtrar pedidos con estado "En Proceso" y ordenar por fecha y hora de entrega
-    cursor.execute("SELECT id, fecha_hora_entrega AS dia, fecha_hora_entrega, descripcion FROM pedidos WHERE estado = 'En Proceso' ORDER BY fecha_hora_entrega ASC")
+    cursor.execute("SELECT id, fecha_hora_entrega AS dia, fecha_hora_entrega, modelo_ramo, descripcion FROM pedidos WHERE estado = 'En Proceso' ORDER BY fecha_hora_entrega ASC")
     pedidos = cursor.fetchall()
     conn.close()
 
@@ -91,16 +91,18 @@ tree_frame = ttk.Frame(main_frame)
 tree_frame.pack(fill="both", expand=True, pady=10)
 
 # Crear la tabla
-tree = ttk.Treeview(tree_frame, columns=("Id", "Dia", "Fecha y Hora Entrega", "Descripcion"), show="headings")
+tree = ttk.Treeview(tree_frame, columns=("Id", "Dia", "Fecha y Hora Entrega", "Modelo de Ramo", "Descripcion"), show="headings")
 tree.heading("Id", text="Id")
 tree.heading("Dia", text="Dia")
 tree.heading("Fecha y Hora Entrega", text="Fecha y Hora Entrega")
+tree.heading("Modelo de Ramo", text="Modelo de Ramo")
 tree.heading("Descripcion", text="Descripcion")
 
 # Configurar el ancho de las columnas
 tree.column("Id", width=1, anchor="w")
 tree.column("Dia", width=10, anchor="center")
 tree.column("Fecha y Hora Entrega", width=10, anchor="center")
+tree.column("Modelo de Ramo", width=10, anchor="center")
 tree.column("Descripcion", width=200, anchor="w")
 
 tree.pack(fill="both", expand=True)
