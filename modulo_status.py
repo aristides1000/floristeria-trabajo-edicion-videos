@@ -9,18 +9,20 @@ def conectar_db():
     cursor = conn.cursor()
     # Crear la tabla si no existe
     cursor.execute('''CREATE TABLE IF NOT EXISTS pedidos (
-                        id INTEGER PRIMARY KEY AUTOINCREMENT,
-                        fecha_hora TEXT,
-                        cliente TEXT,
-                        telefono TEXT,
-                        direccion TEXT,
-                        forma_pago TEXT,
-                        modelo_ramo TEXT,
-                        costo REAL,
-                        fecha_hora_entrega TEXT,
-                        enviado_a TEXT,
-                        descripcion TEXT,
-                        estado TEXT)''')
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    fecha_hora TEXT,
+                    cliente TEXT,
+                    telefono TEXT,
+                    direccion TEXT,
+                    forma_pago TEXT,
+                    modelo_ramo TEXT,
+                    costo REAL,
+                    fecha_hora_entrega TEXT,
+                    enviado_a TEXT,
+                    descripcion TEXT,
+                    costo_adicional REAL,
+                    costo_total REAL,
+                    estado TEXT)''')
     conn.commit()
     conn.close()
 
