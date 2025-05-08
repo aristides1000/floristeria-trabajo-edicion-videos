@@ -164,8 +164,9 @@ def agregar_pedido():
         conn.close()
     limpiar_campos()
     mostrar_pedidos()
-    calcular_costo_acumulado()  # Calcular el costo acumulado después de agregar un pedido
+    calcular_costo_acumulado() # Calcular el costo acumulado después de agregar un pedido
     calcular_costo_acumulado_sin_cuentas_por_cobrar() # Calcular el costo acumulado sin cuentas por cobrar después de agregar un pedido
+    calcular_saldo_por_cobrar() # Calcular el costo de saldo por cobrar después de agregar un pedido
     messagebox.showinfo("Éxito", "Pedido agregado correctamente.")
 
 # Función para modificar un pedido
@@ -219,7 +220,8 @@ def modificar_pedido():
     limpiar_campos()
     mostrar_pedidos()
     calcular_costo_acumulado()  # Calcular el costo acumulado después de modificar un pedido
-    calcular_costo_acumulado_sin_cuentas_por_cobrar() # Calcular el costo acumulado sin cuentas por cobrar después de agregar un pedido
+    calcular_costo_acumulado_sin_cuentas_por_cobrar() # Calcular el costo acumulado sin cuentas por cobrar después de modificara un pedido
+    calcular_saldo_por_cobrar() # Calcular el costo de saldo por cobrar después de modificar un pedido
     messagebox.showinfo("Éxito", "Pedido modificado correctamente.")
 
 # Función para eliminar un pedido
@@ -241,7 +243,8 @@ def eliminar_pedido():
     limpiar_campos()
     mostrar_pedidos()
     calcular_costo_acumulado()  # Calcular el costo acumulado después de eliminar un pedido
-    calcular_costo_acumulado_sin_cuentas_por_cobrar() # Calcular el costo acumulado sin cuentas por cobrar después de agregar un pedido
+    calcular_costo_acumulado_sin_cuentas_por_cobrar() # Calcular el costo acumulado sin cuentas por cobrar después de eliminar un pedido
+    calcular_saldo_por_cobrar() # Calcular el costo de saldo por cobrar después de eliminar un pedido
     messagebox.showinfo("Éxito", "Pedido eliminado correctamente.")
 
 # Función para mostrar los pedidos en la tabla
