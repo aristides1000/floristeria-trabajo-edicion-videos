@@ -165,7 +165,7 @@ def modificar_pedido():
         return
     try:
         # Convertir el costo_adicional a float
-        costo_adicional = float(entry_costo_adicional.get())
+        costo_adicional = float(0 if (entry_costo_adicional.get() == "") else entry_costo_adicional.get())
     except ValueError:
         messagebox.showerror("Error", "El costo adicional debe ser un número válido.")
         return
@@ -599,7 +599,7 @@ for i, text in enumerate(labels):
     elif text == "Forma de Pago":
         # Combobox para la forma de pago
         ttk.Label(form_frame, text=text, anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
-        forma_pago_combobox = ttk.Combobox(form_frame, textvariable=forma_pago_var, values=["Transferencia", "PagoMóvil", "Efectivo"], state="readonly", width=20)
+        forma_pago_combobox = ttk.Combobox(form_frame, textvariable=forma_pago_var, values=["Transferencia", "PagoMóvil", "Efectivo", "Zelle", "Por Cobrar"], state="readonly", width=20)
         forma_pago_combobox.grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
         forma_pago_combobox.current(0)
         row_index += 1
