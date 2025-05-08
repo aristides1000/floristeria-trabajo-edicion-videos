@@ -105,6 +105,20 @@ def calcular_costo_acumulado_sin_cuentas_por_cobrar():
     finally:
         conn.close()
 
+# Función para calcular el costo acumulado sin cuentas por cobrar
+def calcular_saldo_por_cobrar():
+    try:
+        conn = sqlite3.connect("floristeria.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT SUM(costo + costo_adicional) FROM pedidos WHERE forma_pago = 'Por Cobrar'")
+        resultado = cursor.fetchone()[0]
+        costo_saldo_cobrar = resultado if resultado else 0.0  # Si no hay pedidos, el costo es 0.0
+        costo_saldo_cobrar_var.set(round(costo_saldo_cobrar, 2))  # Actualizar la variable con el costo acumulado
+    except sqlite3.Error as e:
+        messagebox.showerror("Error", f"Ocurrió un error al calcular el costo acumulado sin costo acumulado sin cobrar: {e}")
+    finally:
+        conn.close()
+
 # Función para agregar un pedido
 def agregar_pedido():
     prefijo = prefijo_var.get()  # Obtener el prefijo seleccionado
@@ -689,6 +703,12 @@ ttk.Label(form_frame, text="Costo Acumulado sin cuentas por cobrar:", anchor="w"
 ttk.Label(form_frame, textvariable=costo_acumulado_cobrar_var, anchor="w").grid(row=row_index - 1, column=3, padx=5, pady=5, sticky="w")
 row_index += 1
 
+# Campo para el costo saldo por cobrar
+costo_saldo_cobrar_var = tk.DoubleVar(value=0.0)
+ttk.Label(form_frame, text="Costo Saldo por cobrar:", anchor="w").grid(row=row_index - 2, column=4, padx=5, pady=5, sticky="w")
+ttk.Label(form_frame, textvariable=costo_saldo_cobrar_var, anchor="w").grid(row=row_index - 2, column=5, padx=5, pady=5, sticky="w")
+row_index += 1
+
 # Botones
 btn_frame = ttk.Frame(main_frame)
 btn_frame.pack(fill="x", pady=10)
@@ -731,6 +751,9 @@ calcular_costo_acumulado()
 
 # Calcular el costo acumulado sin cuentas por cobrar inicial
 calcular_costo_acumulado_sin_cuentas_por_cobrar()
+
+# Calcular el saldo por cobrar inicial
+calcular_saldo_por_cobrar()
 
 # Ejecutar la aplicación
 root.mainloop()
