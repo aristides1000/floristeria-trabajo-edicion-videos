@@ -58,6 +58,21 @@ def calcular_saldo_pago_movil():
   finally:
     conn.close()
 
+def calcular_saldo_efectivo():
+  try:
+    conn = sqlite3.connect("floristeria.db")
+    cursor = conn.cursor()
+    fecha_hora_inicial = f"{entry_fecha_inicial.get()} {hora_inicial_var.get()}"
+    fecha_hora_final = f"{entry_fecha_final.get()} {hora_inicial_var.get()}"
+    cursor.execute("SELECT SUM(costo_total) FROM pedidos WHERE (fecha_hora BETWEEN ? AND ?) AND forma_pago = 'Efectivo'", (fecha_hora_inicial, fecha_hora_final))
+    resultado = cursor.fetchone()[0]
+    saldo_efectivo = resultado if resultado else 0.0  # Si no hay pedidos, el costo es 0.0
+    saldo_efectivo_var.set(round(saldo_efectivo, 2))  # Actualizar la variable con el costo acumulado
+  except sqlite3.Error as e:
+    messagebox.showerror("Error", f"Ocurrió un error al calcular el costo acumulado: {fecha_hora_inicial} {fecha_hora_final} {e}")
+  finally:
+    conn.close()
+
 def calcular_costo_acumulado_rango_fechas():
   try:
     conn = sqlite3.connect("floristeria.db")
@@ -72,6 +87,7 @@ def calcular_costo_acumulado_rango_fechas():
     # Calculo de otros saldos
     calcular_saldo_transferencia()
     calcular_saldo_pago_movil()
+    calcular_saldo_efectivo()
 
   except sqlite3.Error as e:
     messagebox.showerror("Error", f"Ocurrió un error al calcular el costo acumulado: {fecha_hora_inicial} {fecha_hora_final} {e}")
@@ -87,6 +103,7 @@ def limpiar_campos():
   costo_acumulado_var.set(0.0)
   saldo_transferencia_var.set(0.0)
   saldo_pago_movil_var.set(0.0)
+  saldo_efectivo_var.set(0.0)
 
 # Configuración de la ventana principal
 root = tk.Tk()
@@ -132,7 +149,7 @@ ttk.Button(btn_frame, text="Limpiar Campos", command=limpiar_campos).pack(side="
 labels = [
     "Fecha Inicial", "Hora Inicial (HH:MM)", "Fecha Final",
     "Hora Final (HH:MM)", "Saldo Transferencia", "Saldo Pago movil",
-    "Costo Total"
+    "Saldo Efectivo", "Costo Total"
 ]
 
 row_index = 0
@@ -169,6 +186,12 @@ for i, text in enumerate(labels):
     saldo_pago_movil_var = tk.DoubleVar(value=0.0)
     ttk.Label(form_frame, text="Saldo Pago Movil:", anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
     ttk.Label(form_frame, textvariable=saldo_pago_movil_var, anchor="w").grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
+    row_index += 1
+  elif text == "Saldo Efectivo":
+    # Campo para el costo acumulado
+    saldo_efectivo_var = tk.DoubleVar(value=0.0)
+    ttk.Label(form_frame, text="Saldo Efectivo:", anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
+    ttk.Label(form_frame, textvariable=saldo_efectivo_var, anchor="w").grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
     row_index += 1
   elif text == "Costo Total":
     # Campo para el costo acumulado
