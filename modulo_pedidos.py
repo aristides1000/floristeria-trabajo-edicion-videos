@@ -27,6 +27,10 @@ def conectar_db():
                         forma_pago TEXT,
                         modelo_ramo TEXT,
                         costo REAL,
+                        forma_pago_dos TEXT,
+                        costo_dos REAL,
+                        forma_pago_tres TEXT,
+                        costo_tres REAL,
                         fecha_hora_entrega TEXT,
                         enviado_a TEXT,
                         descripcion TEXT,
@@ -82,7 +86,7 @@ def calcular_costo_acumulado():
     try:
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT SUM(costo + costo_adicional) FROM pedidos")
+        cursor.execute("SELECT SUM(costo + costo_dos + costo_tres + costo_adicional) FROM pedidos")
         resultado = cursor.fetchone()[0]
         costo_acumulado = resultado if resultado else 0.0  # Si no hay pedidos, el costo es 0.0
         costo_acumulado_var.set(round(costo_acumulado, 2))  # Actualizar la variable con el costo acumulado
@@ -96,7 +100,7 @@ def calcular_costo_acumulado_sin_cuentas_por_cobrar():
     try:
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT SUM(costo + costo_adicional) FROM pedidos WHERE forma_pago <> 'Por Cobrar'")
+        cursor.execute("SELECT SUM(costo + costo_dos + costo_tres + costo_adicional) FROM pedidos WHERE forma_pago <> 'Por Cobrar'")
         resultado = cursor.fetchone()[0]
         costo_acumulado_cobrar = resultado if resultado else 0.0  # Si no hay pedidos, el costo es 0.0
         costo_acumulado_cobrar_var.set(round(costo_acumulado_cobrar, 2))  # Actualizar la variable con el costo acumulado
@@ -110,7 +114,7 @@ def calcular_saldo_por_cobrar():
     try:
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT SUM(costo + costo_adicional) FROM pedidos WHERE forma_pago = 'Por Cobrar'")
+        cursor.execute("SELECT SUM(costo + costo_dos + costo_tres + costo_adicional) FROM pedidos WHERE forma_pago = 'Por Cobrar'")
         resultado = cursor.fetchone()[0]
         costo_saldo_cobrar = resultado if resultado else 0.0  # Si no hay pedidos, el costo es 0.0
         costo_saldo_cobrar_var.set(round(costo_saldo_cobrar, 2))  # Actualizar la variable con el costo acumulado

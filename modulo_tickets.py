@@ -13,14 +13,23 @@ def crear_base_datos():
     cursor.execute('''
         CREATE TABLE IF NOT EXISTS pedidos (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            cliente TEXT NOT NULL,
-            telefono TEXT NOT NULL,
+            fecha_hora TEXT,
+            cliente TEXT,
+            telefono TEXT,
             direccion TEXT,
-            delivery_persona TEXT,  -- Persona que realiza el Delivery
-            enviado_a TEXT,         -- Dirección o persona a quien se envía
-            tipo_entrega TEXT NOT NULL,  -- Recoger / Delivery
+            forma_pago TEXT,
+            modelo_ramo TEXT,
+            costo REAL,
+            forma_pago_dos TEXT,
+            costo_dos REAL,
+            forma_pago_tres TEXT,
+            costo_tres REAL,
+            fecha_hora_entrega TEXT,
+            enviado_a TEXT,
             descripcion TEXT,
-            estado TEXT NOT NULL
+            costo_adicional REAL,
+            costo_total REAL,
+            estado TEXT
         )
     ''')
 
