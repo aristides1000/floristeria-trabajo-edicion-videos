@@ -22,6 +22,7 @@ def crear_base_datos():
             costo REAL,
             fecha_hora_entrega TEXT,
             enviado_a TEXT,
+            telefono_receptor TEXT,
             descripcion TEXT,
             costo_adicional REAL,
             costo_total REAL,
@@ -92,7 +93,7 @@ def generar_ticket_seleccionado(item_id):
 
         # Consulta SQL: Asegurarse de que el orden de las columnas coincida con el de la tabla Treeview
         cursor.execute('''
-            SELECT id, cliente, telefono, direccion, delivery_persona, enviado_a, tipo_entrega, descripcion, estado 
+            SELECT id, cliente, telefono, direccion, delivery_persona, enviado_a, tipo_entrega, descripcion, estado
             FROM pedidos
             WHERE id = ?
         ''', (item_id,))

@@ -29,6 +29,7 @@ def conectar_db():
                         costo REAL,
                         fecha_hora_entrega TEXT,
                         enviado_a TEXT,
+                        telefono_receptor TEXT,
                         descripcion TEXT,
                         costo_adicional REAL,
                         costo_total REAL,
@@ -122,10 +123,11 @@ def calcular_saldo_por_cobrar():
 
 # Función para agregar un pedido
 def agregar_pedido():
-    telefono_completo = f"{entry_telefono.get()}" # Combinar "+" y número de teléfono
+    telefono_completo = entry_telefono.get() # Combinar "+" y número de teléfono
     fecha_hora = f"{entry_fecha.get()} {hora_var.get()}"
     fecha_hora_entrega = f"{entry_entrega.get()} {hora_entrega_var.get()}"
     enviado_a = entry_enviado_a.get()
+    telefono_receptor = entry_telefono_receptor.get()
     descripcion = entry_descripcion.get()
     estado = estado_var.get()
     modelo_ramo = modelo_ramo_var.get()  # Obtener el modelo seleccionado
@@ -159,9 +161,9 @@ def agregar_pedido():
     try:
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO pedidos (fecha_hora, cliente, telefono, direccion, forma_pago, modelo_ramo, costo, fecha_hora_entrega, enviado_a, descripcion, costo_adicional, numero_factura, costo_total, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        cursor.execute("INSERT INTO pedidos (fecha_hora, cliente, telefono, direccion, forma_pago, modelo_ramo, costo, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional, numero_factura, costo_total, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                        (fecha_hora, entry_cliente.get(), telefono_completo, entry_direccion.get(),
-                        forma_pago_var.get(), modelo_ramo, costo, fecha_hora_entrega, enviado_a, descripcion, costo_adicional, numero_factura, costo_total, estado))
+                        forma_pago_var.get(), modelo_ramo, costo, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional, numero_factura, costo_total, estado))
         conn.commit()
     except sqlite3.Error as e:
         messagebox.showerror("Error", f"Ocurrió un error al agregar el pedido: {e}")
@@ -180,10 +182,11 @@ def modificar_pedido():
     if not selected_item:
         messagebox.showerror("Error", "Seleccione un pedido para modificar.")
         return
-    telefono_completo = f"{entry_telefono.get()}"  # Combinar prefijo y número de teléfono
+    telefono_completo = entry_telefono.get()  # Combinar prefijo y número de teléfono
     fecha_hora = f"{entry_fecha.get()} {hora_var.get()}"
     fecha_hora_entrega = f"{entry_entrega.get()} {hora_entrega_var.get()}"
     enviado_a = entry_enviado_a.get()
+    telefono_receptor = entry_telefono_receptor.get()
     descripcion = entry_descripcion.get()
     estado = estado_var.get()
     modelo_ramo = modelo_ramo_var.get()  # Obtener el modelo seleccionado
@@ -218,9 +221,9 @@ def modificar_pedido():
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
         pedido_id = tree.item(selected_item)['values'][0]
-        cursor.execute("UPDATE pedidos SET fecha_hora=?, cliente=?, telefono=?, direccion=?, forma_pago=?, modelo_ramo=?, costo=?, fecha_hora_entrega=?, enviado_a=?, descripcion=?, costo_adicional=?, numero_factura=?, costo_total=?, estado=? WHERE id=?",
+        cursor.execute("UPDATE pedidos SET fecha_hora=?, cliente=?, telefono=?, direccion=?, forma_pago=?, modelo_ramo=?, costo=?, fecha_hora_entrega=?, enviado_a=?, telefono_receptor=?, descripcion=?, costo_adicional=?, numero_factura=?, costo_total=?, estado=? WHERE id=?",
                        (fecha_hora, entry_cliente.get(), telefono_completo, entry_direccion.get(),
-                        forma_pago_var.get(), modelo_ramo, costo, fecha_hora_entrega, enviado_a, descripcion, costo_adicional, numero_factura, costo_total, estado, pedido_id))
+                        forma_pago_var.get(), modelo_ramo, costo, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional, numero_factura, costo_total, estado, pedido_id))
         conn.commit()
     except sqlite3.Error as e:
         messagebox.showerror("Error", f"Ocurrió un error al modificar el pedido: {e}")
@@ -265,7 +268,7 @@ def mostrar_pedidos():
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
         """ cursor.execute("SELECT * FROM pedidos") """
-        cursor.execute("SELECT id, fecha_hora, cliente, telefono, direccion, forma_pago, modelo_ramo, costo, fecha_hora_entrega, enviado_a, descripcion, costo_adicional, numero_factura, costo_total, estado FROM pedidos;")
+        cursor.execute("SELECT id, fecha_hora, cliente, telefono, direccion, forma_pago, modelo_ramo, costo, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional, numero_factura, costo_total, estado FROM pedidos;")
         rows = cursor.fetchall()
         # Definir tags para los colores de fondo
         tree.tag_configure("en_proceso", background="#33f6ff")  # azul claro
@@ -273,7 +276,7 @@ def mostrar_pedidos():
         tree.tag_configure("armado", background="#f5ef42")      # amarillo
         for row in rows:
             # Determinar el tag según el estado del pedido
-            estado = row[14]  # Última columna: estado
+            estado = row[15]  # Última columna: estado
             if (estado == "En Proceso"):
                 tag = "en_proceso"
             elif (estado == "Enviado"):
@@ -312,15 +315,17 @@ def cargar_pedido(event):
             hora_entrega_var.set(pedido[8].split()[1])  # Hora de entrega
             entry_enviado_a.delete(0, tk.END)
             entry_enviado_a.insert(0, pedido[9])  # Enviado a
+            entry_telefono_receptor.delete(0, tk.END)
+            entry_telefono_receptor.insert(0, f"+{pedido[10]}")
             entry_descripcion.delete(0, tk.END)
-            entry_descripcion.insert(0, pedido[10])
+            entry_descripcion.insert(0, pedido[11])
             entry_costo_adicional.delete(0, tk.END)
-            entry_costo_adicional.insert(0, pedido[11])  # Costo Adicional
+            entry_costo_adicional.insert(0, pedido[12])  # Costo Adicional
             entry_numero_factura.delete(0, tk.END)
-            entry_numero_factura.insert(0, pedido[12])  # Numero Factura
+            entry_numero_factura.insert(0, pedido[13])  # Numero Factura
             entry_costo_total.delete(0, tk.END)
-            entry_costo_total.insert(0, pedido[13])  # Costo Total
-            estado_var.set(pedido[14])  # Estado del pedido
+            entry_costo_total.insert(0, pedido[14])  # Costo Total
+            estado_var.set(pedido[15])  # Estado del pedido
         except Exception as e:
             messagebox.showerror("Error", f"Ocurrió un error al cargar los datos: {e}")
 
@@ -337,6 +342,7 @@ def limpiar_campos():
     entry_entrega.set_date(datetime.now().date())  # Establecer la fecha actual
     hora_entrega_var.set("08:00")  # Establecer una hora predeterminada
     entry_enviado_a.delete(0, tk.END)
+    entry_telefono_receptor.delete(0, tk.END)
     entry_descripcion.delete(0, tk.END)
     entry_costo_adicional.delete(0, tk.END)
     entry_numero_factura.delete(0, tk.END)
@@ -607,6 +613,7 @@ entry_costo = ttk.Entry(form_frame, width=20)
 entry_entrega = DateEntry(form_frame, date_pattern='yyyy-MM-dd')
 hora_entrega_var = tk.StringVar()
 entry_enviado_a = ttk.Entry(form_frame, width=40)
+entry_telefono_receptor = ttk.Entry(form_frame, width=20)
 entry_descripcion = ttk.Entry(form_frame, width=60)
 entry_costo_adicional = ttk.Entry(form_frame, width=20)
 entry_numero_factura = ttk.Entry(form_frame, width=10)
@@ -617,7 +624,7 @@ estado_var = tk.StringVar()
 labels = [
     "Fecha del Pedido", "Hora del Pedido (HH:MM)", "Cliente",
     "Teléfono", "Forma de Pago", "Modelo del Ramo",
-    "Costo", "Fecha de Entrega", "Hora de Entrega (HH:MM)", "Enviado a", "Descripcion", "Costo Adicional", "Numero de Factura"
+    "Costo", "Fecha de Entrega", "Hora de Entrega (HH:MM)", "Enviado a", "Teléfono Receptor", "Descripcion", "Costo Adicional", "Numero de Factura"
 ]
 row_index = 0  # Índice para controlar las filas
 for i, text in enumerate(labels):
@@ -668,6 +675,11 @@ for i, text in enumerate(labels):
         # Entrada para "Enviado a"
         ttk.Label(form_frame, text=text, anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
         entry_enviado_a.grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
+        row_index += 1
+    elif text == "Teléfono Receptor":
+        # Entrada para ""Teléfono Receptor""
+        ttk.Label(form_frame, text=text, anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
+        entry_telefono_receptor.grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
         row_index += 1
     elif text == "Descripcion":
         # Entrada para "Descripcion"
@@ -736,7 +748,7 @@ ttk.Button(search_frame, text="Buscar", command=buscar_pedidos).pack(side="left"
 # Tabla de pedidos
 tree_frame = ttk.Frame(main_frame)
 tree_frame.pack(fill="both", expand=True, pady=10)
-tree = ttk.Treeview(tree_frame, columns=("ID", "Fecha y Hora", "Cliente", "Teléfono Remitente", "Dirección", "Forma de Pago", "Modelo del Ramo", "Costo", "Fecha y Hora Entrega", "Enviado a", "Descripcion", "Costo Adicional", "Numero de Factura", "Costo Total", "Estado"), show="headings")
+tree = ttk.Treeview(tree_frame, columns=("ID", "Fecha y Hora", "Cliente", "Teléfono Remitente", "Dirección", "Forma de Pago", "Modelo del Ramo", "Costo", "Fecha y Hora Entrega", "Enviado a", "Teléfono Receptor", "Descripcion", "Costo Adicional", "Numero de Factura", "Costo Total", "Estado"), show="headings")
 for col in tree['columns']:
     tree.heading(col, text=col)
     tree.column(col, width=120, anchor="center")
