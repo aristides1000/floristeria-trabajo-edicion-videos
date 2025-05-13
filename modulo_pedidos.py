@@ -6,9 +6,9 @@ from datetime import datetime
 import csv
 import subprocess  # Para ejecutar el módulo externo
 from dotenv import load_dotenv # para ejecutar las variables de ambiente
-import os  # Para manejar rutas de archivos
+import os # Para manejar rutas de archivos
 
-load_dotenv()  # Carga las variables desde .env
+load_dotenv() # Carga las variables desde .env
 
 # Acceder a las variables .env
 python_command = os.getenv("PYTHON_COMMAND")
@@ -121,8 +121,7 @@ def calcular_saldo_por_cobrar():
 
 # Función para agregar un pedido
 def agregar_pedido():
-    prefijo = prefijo_var.get()  # Obtener el prefijo seleccionado
-    telefono_completo = f"{prefijo}{entry_telefono.get()}"  # Combinar prefijo y número de teléfono
+    telefono_completo = f"{entry_telefono.get()}" # Combinar "+" y número de teléfono
     fecha_hora = f"{entry_fecha.get()} {hora_var.get()}"
     fecha_hora_entrega = f"{entry_entrega.get()} {hora_entrega_var.get()}"
     enviado_a = entry_enviado_a.get()
@@ -175,8 +174,7 @@ def modificar_pedido():
     if not selected_item:
         messagebox.showerror("Error", "Seleccione un pedido para modificar.")
         return
-    prefijo = prefijo_var.get()  # Obtener el prefijo seleccionado
-    telefono_completo = f"{prefijo}{entry_telefono.get()}"  # Combinar prefijo y número de teléfono
+    telefono_completo = f"{entry_telefono.get()}"  # Combinar prefijo y número de teléfono
     fecha_hora = f"{entry_fecha.get()} {hora_var.get()}"
     fecha_hora_entrega = f"{entry_entrega.get()} {hora_entrega_var.get()}"
     enviado_a = entry_enviado_a.get()
@@ -290,15 +288,9 @@ def cargar_pedido(event):
             entry_cliente.delete(0, tk.END)
             entry_cliente.insert(0, pedido[2])  # Cliente
             # Manejar el número de teléfono
-            telefono_completo = str(pedido[3])  # Convertir explícitamente a cadena
-            if len(telefono_completo) >= 3:  # Verificar longitud mínima para el prefijo
-                prefijo_var.set(telefono_completo[:3])  # Prefijo del teléfono
-                entry_telefono.delete(0, tk.END)
-                entry_telefono.insert(0, telefono_completo[3:])  # Teléfono
-            else:
-                prefijo_var.set("")  # Limpiar el Combobox si no hay suficientes caracteres
-                entry_telefono.delete(0, tk.END)
-                entry_telefono.insert(0, telefono_completo)  # Mostrar el teléfono tal como está
+            telefono_completo = f"+{pedido[3]}"  # Agregar el "+" al principio de la cadena
+            entry_telefono.delete(0, tk.END)
+            entry_telefono.insert(0, telefono_completo)  # Mostrar el teléfono tal como está
             entry_direccion.delete(0, tk.END)
             entry_direccion.insert(0, pedido[4])  # Dirección
             forma_pago_var.set(pedido[5])  # Forma de pago
@@ -324,7 +316,6 @@ def limpiar_campos():
     entry_fecha.set_date(datetime.now().date())  # Establecer la fecha actual
     hora_var.set("08:00")  # Establecer una hora predeterminada
     entry_cliente.delete(0, tk.END)
-    prefijo_var.set("")  # Limpiar el Combobox del prefijo
     entry_telefono.delete(0, tk.END)
     entry_direccion.delete(0, tk.END)
     forma_pago_var.set("")
@@ -594,7 +585,6 @@ form_frame.pack(fill="x", padx=10, pady=10)
 entry_fecha = DateEntry(form_frame, date_pattern='yyyy-MM-dd')
 hora_var = tk.StringVar()
 entry_cliente = ttk.Entry(form_frame, width=40)
-prefijo_var = tk.StringVar()
 entry_telefono = ttk.Entry(form_frame, width=20)
 entry_direccion = ttk.Entry(form_frame, width=60)
 forma_pago_var = tk.StringVar()
@@ -617,14 +607,9 @@ labels = [
 row_index = 0  # Índice para controlar las filas
 for i, text in enumerate(labels):
     if text == "Teléfono":
-        # Etiqueta y combobox para el prefijo del teléfono
-        ttk.Label(form_frame, text="Prefijo Teléfono", anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
-        prefijo_combobox = ttk.Combobox(form_frame, textvariable=prefijo_var, values=["212", "412", "416", "426", "414", "424"], state="readonly", width=10)
-        prefijo_combobox.grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
-        prefijo_combobox.current(0)
         # Etiqueta y entrada para los dígitos del teléfono
-        ttk.Label(form_frame, text="Dígitos del Teléfono", anchor="w").grid(row=row_index, column=2, padx=5, pady=5, sticky="w")
-        entry_telefono.grid(row=row_index, column=3, padx=5, pady=5, sticky="w")
+        ttk.Label(form_frame, text="Teléfono de quien envía", anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
+        entry_telefono.grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
         row_index += 1  # Incrementar fila para la siguiente entrada
         # Etiqueta y entrada para la dirección (debajo del teléfono)
         ttk.Label(form_frame, text="Dirección", anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
@@ -734,7 +719,7 @@ ttk.Button(search_frame, text="Buscar", command=buscar_pedidos).pack(side="left"
 # Tabla de pedidos
 tree_frame = ttk.Frame(main_frame)
 tree_frame.pack(fill="both", expand=True, pady=10)
-tree = ttk.Treeview(tree_frame, columns=("ID", "Fecha y Hora", "Cliente", "Teléfono", "Dirección", "Forma de Pago", "Modelo del Ramo", "Costo", "Fecha y Hora Entrega", "Enviado a", "Descripcion", "Costo Adicional", "Costo Total", "Estado"), show="headings")
+tree = ttk.Treeview(tree_frame, columns=("ID", "Fecha y Hora", "Cliente", "Teléfono Remitente", "Dirección", "Forma de Pago", "Modelo del Ramo", "Costo", "Fecha y Hora Entrega", "Enviado a", "Descripcion", "Costo Adicional", "Costo Total", "Estado"), show="headings")
 for col in tree['columns']:
     tree.heading(col, text=col)
     tree.column(col, width=120, anchor="center")
