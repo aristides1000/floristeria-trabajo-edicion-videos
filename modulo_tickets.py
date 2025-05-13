@@ -25,6 +25,7 @@ def crear_base_datos():
             descripcion TEXT,
             costo_adicional REAL,
             costo_total REAL,
+            numero_factura INTEGER NOT NULL,
             estado TEXT
         )
     ''')
