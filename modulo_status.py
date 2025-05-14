@@ -15,7 +15,7 @@ def conectar_db():
                     telefono TEXT,
                     direccion TEXT,
                     modelo_ramo TEXT,
-                    costo REAL,
+                    costo_dolares REAL,
                     fecha_hora_entrega TEXT,
                     enviado_a TEXT,
                     telefono_receptor TEXT,

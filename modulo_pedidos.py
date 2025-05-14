@@ -25,7 +25,7 @@ def conectar_db():
                         telefono TEXT,
                         direccion TEXT,
                         modelo_ramo TEXT,
-                        costo REAL,
+                        costo_dolares REAL,
                         fecha_hora_entrega TEXT,
                         enviado_a TEXT,
                         telefono_receptor TEXT,
@@ -63,8 +63,8 @@ def cargar_modelos_ramos():
     finally:
         conn.close()
 
-# Función para actualizar el costo cuando se selecciona un modelo
-def actualizar_costo(event):
+# Función para actualizar el costo en dolares cuando se selecciona un modelo
+def actualizar_costo_dolares(event):
     modelo_seleccionado = modelo_ramo_var.get()
     if modelo_seleccionado:
         try:
@@ -73,24 +73,24 @@ def actualizar_costo(event):
             cursor.execute("SELECT precio_venta FROM modelos_ramos WHERE nombre_arreglo=?", (modelo_seleccionado,))
             resultado = cursor.fetchone()
             if resultado:
-                entry_costo.delete(0, tk.END)
-                entry_costo.insert(0, resultado[0])
+                entry_costo_dolares.delete(0, tk.END)
+                entry_costo_dolares.insert(0, resultado[0])
         except sqlite3.Error as e:
             messagebox.showerror("Error", f"Ocurrió un error al obtener el precio: {e}")
         finally:
             conn.close()
 
-# Función para calcular el costo acumulado
-def calcular_costo_acumulado():
+# Función para calcular el costo en dolares acumulado
+def calcular_costo_dolares_acumulado():
     try:
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT SUM(costo + costo_adicional) FROM pedidos")
+        cursor.execute("SELECT SUM(costo_dolares + costo_adicional) FROM pedidos")
         resultado = cursor.fetchone()[0]
-        costo_acumulado = resultado if resultado else 0.0  # Si no hay pedidos, el costo es 0.0
-        costo_acumulado_var.set(round(costo_acumulado, 2))  # Actualizar la variable con el costo acumulado
+        costo_dolares_acumulado = resultado if resultado else 0.0  # Si no hay pedidos, el costo es 0.0
+        costo_dolares_acumulado_var.set(round(costo_dolares_acumulado, 2))  # Actualizar la variable con el costo en dolares acumulado
     except sqlite3.Error as e:
-        messagebox.showerror("Error", f"Ocurrió un error al calcular el costo acumulado: {e}")
+        messagebox.showerror("Error", f"Ocurrió un error al calcular el costo en dolares acumulado: {e}")
     finally:
         conn.close()
 
@@ -104,7 +104,7 @@ def calcular_costo_acumulado_sin_cuentas_por_cobrar():
         costo_acumulado_cobrar = resultado if resultado else 0.0  # Si no hay pedidos, el costo es 0.0
         costo_acumulado_cobrar_var.set(round(costo_acumulado_cobrar, 2))  # Actualizar la variable con el costo acumulado
     except sqlite3.Error as e:
-        messagebox.showerror("Error", f"Ocurrió un error al calcular el costo acumulado sin costo acumulado sin cobrar: {e}")
+        messagebox.showerror("Error", f"Ocurrió un error al calcular el costo acumulado sin cuentas cobrar: {e}")
     finally:
         conn.close()
 
@@ -118,7 +118,7 @@ def calcular_saldo_por_cobrar():
         costo_saldo_cobrar = resultado if resultado else 0.0  # Si no hay pedidos, el costo es 0.0
         costo_saldo_cobrar_var.set(round(costo_saldo_cobrar, 2))  # Actualizar la variable con el costo acumulado
     except sqlite3.Error as e:
-        messagebox.showerror("Error", f"Ocurrió un error al calcular el costo acumulado sin costo acumulado sin cobrar: {e}")
+        messagebox.showerror("Error", f"Ocurrió un error al calcular el costo sin cobrar: {e}")
     finally:
         conn.close()
 
@@ -133,14 +133,14 @@ def agregar_pedido():
     estado = estado_var.get()
     modelo_ramo = modelo_ramo_var.get()  # Obtener el modelo seleccionado
     # Validar campos obligatorios
-    if not (entry_cliente.get() and entry_direccion.get() and modelo_ramo and entry_costo.get()):
+    if not (entry_cliente.get() and entry_direccion.get() and modelo_ramo and entry_costo_dolares.get()):
         messagebox.showerror("Error", "Todos los campos son obligatorios.")
         return
     try:
-        # Convertir el costo a float
-        costo = float(entry_costo.get())
+        # Convertir el costo en dolares a float
+        costo_dolares = float(entry_costo_dolares.get())
     except ValueError:
-        messagebox.showerror("Error", "El costo debe ser un número válido.")
+        messagebox.showerror("Error", "El costo en dolares debe ser un número válido.")
         return
     try:
         # Convertir el costo_adicional a float
@@ -155,15 +155,15 @@ def agregar_pedido():
         return
     try:
         # Convertir el costo_adicional a float
-        costo_total = float(costo + costo_adicional)
+        costo_total = float(costo_dolares + costo_adicional)
     except ValueError:
-        messagebox.showerror("Error", "El costo total debe ser un número válido.")
+        messagebox.showerror("Error", "El costo total en dolares debe ser un número válido.")
         return
     try:
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO pedidos (fecha_hora, cliente, telefono, direccion, modelo_ramo, costo, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional, numero_factura, costo_total, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                       (fecha_hora, entry_cliente.get(), telefono_completo, entry_direccion.get(), modelo_ramo, costo, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional, numero_factura, costo_total, estado))
+        cursor.execute("INSERT INTO pedidos (fecha_hora, cliente, telefono, direccion, modelo_ramo, costo_dolares, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional, numero_factura, costo_total, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                       (fecha_hora, entry_cliente.get(), telefono_completo, entry_direccion.get(), modelo_ramo, costo_dolares, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional, numero_factura, costo_total, estado))
         conn.commit()
     except sqlite3.Error as e:
         messagebox.showerror("Error", f"Ocurrió un error al agregar el pedido: {e}")
@@ -171,7 +171,7 @@ def agregar_pedido():
         conn.close()
     limpiar_campos()
     mostrar_pedidos()
-    calcular_costo_acumulado() # Calcular el costo acumulado después de agregar un pedido
+    calcular_costo_dolares_acumulado() # Calcular el costo en dolares acumulado después de agregar un pedido
     calcular_costo_acumulado_sin_cuentas_por_cobrar() # Calcular el costo acumulado sin cuentas por cobrar después de agregar un pedido
     calcular_saldo_por_cobrar() # Calcular el costo de saldo por cobrar después de agregar un pedido
     messagebox.showinfo("Éxito", "Pedido agregado correctamente.")
@@ -191,14 +191,14 @@ def modificar_pedido():
     estado = estado_var.get()
     modelo_ramo = modelo_ramo_var.get()  # Obtener el modelo seleccionado
     # Validar campos obligatorios
-    if not (entry_cliente.get() and entry_direccion.get() and modelo_ramo and entry_costo.get()):
+    if not (entry_cliente.get() and entry_direccion.get() and modelo_ramo and entry_costo_dolares.get()):
         messagebox.showerror("Error", "Todos los campos son obligatorios.")
         return
     try:
-        # Convertir el costo a float
-        costo = float(entry_costo.get())
+        # Convertir el costo en dolares a float
+        costo_dolares = float(entry_costo_dolares.get())
     except ValueError:
-        messagebox.showerror("Error", "El costo debe ser un número válido.")
+        messagebox.showerror("Error", "El costo en dolares debe ser un número válido.")
         return
     try:
         # Convertir el costo_adicional a float
@@ -212,8 +212,8 @@ def modificar_pedido():
         messagebox.showerror("Error", "El numero de factura debe ser un número válido.")
         return
     try:
-        # Convertir el costo_adicional a float
-        costo_total = float(costo + costo_adicional)
+        # Convertir el costo_total a float
+        costo_total = float(costo_dolares + costo_adicional)
     except ValueError:
         messagebox.showerror("Error", "El costo total debe ser un número válido.")
         return
@@ -221,8 +221,8 @@ def modificar_pedido():
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
         pedido_id = tree.item(selected_item)['values'][0]
-        cursor.execute("UPDATE pedidos SET fecha_hora=?, cliente=?, telefono=?, direccion=?, modelo_ramo=?, costo=?, fecha_hora_entrega=?, enviado_a=?, telefono_receptor=?, descripcion=?, costo_adicional=?, numero_factura=?, costo_total=?, estado=? WHERE id=?",
-                       (fecha_hora, entry_cliente.get(), telefono_completo, entry_direccion.get(), modelo_ramo, costo, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional, numero_factura, costo_total, estado, pedido_id))
+        cursor.execute("UPDATE pedidos SET fecha_hora=?, cliente=?, telefono=?, direccion=?, modelo_ramo=?, costo_dolares=?, fecha_hora_entrega=?, enviado_a=?, telefono_receptor=?, descripcion=?, costo_adicional=?, numero_factura=?, costo_total=?, estado=? WHERE id=?",
+                       (fecha_hora, entry_cliente.get(), telefono_completo, entry_direccion.get(), modelo_ramo, costo_dolares, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional, numero_factura, costo_total, estado, pedido_id))
         conn.commit()
     except sqlite3.Error as e:
         messagebox.showerror("Error", f"Ocurrió un error al modificar el pedido: {e}")
@@ -230,7 +230,7 @@ def modificar_pedido():
         conn.close()
     limpiar_campos()
     mostrar_pedidos()
-    calcular_costo_acumulado()  # Calcular el costo acumulado después de modificar un pedido
+    calcular_costo_dolares_acumulado()  # Calcular el costo acumulado después de modificar un pedido
     calcular_costo_acumulado_sin_cuentas_por_cobrar() # Calcular el costo acumulado sin cuentas por cobrar después de modificara un pedido
     calcular_saldo_por_cobrar() # Calcular el costo de saldo por cobrar después de modificar un pedido
     messagebox.showinfo("Éxito", "Pedido modificado correctamente.")
@@ -253,7 +253,7 @@ def eliminar_pedido():
         conn.close()
     limpiar_campos()
     mostrar_pedidos()
-    calcular_costo_acumulado()  # Calcular el costo acumulado después de eliminar un pedido
+    calcular_costo_dolares_acumulado()  # Calcular el costo en dolares acumulado después de eliminar un pedido
     calcular_costo_acumulado_sin_cuentas_por_cobrar() # Calcular el costo acumulado sin cuentas por cobrar después de eliminar un pedido
     calcular_saldo_por_cobrar() # Calcular el costo de saldo por cobrar después de eliminar un pedido
     messagebox.showinfo("Éxito", "Pedido eliminado correctamente.")
@@ -267,7 +267,7 @@ def mostrar_pedidos():
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
         """ cursor.execute("SELECT * FROM pedidos") """
-        cursor.execute("SELECT id, fecha_hora, cliente, telefono, direccion, modelo_ramo, costo, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional, numero_factura, costo_total, estado FROM pedidos;")
+        cursor.execute("SELECT id, fecha_hora, cliente, telefono, direccion, modelo_ramo, costo_dolares, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional, numero_factura, costo_total, estado FROM pedidos;")
         rows = cursor.fetchall()
         # Definir tags para los colores de fondo
         tree.tag_configure("en_proceso", background="#33f6ff")  # azul claro
@@ -307,8 +307,8 @@ def cargar_pedido(event):
             entry_direccion.delete(0, tk.END)
             entry_direccion.insert(0, pedido[4])  # Dirección
             modelo_ramo_var.set(pedido[5])  # Modelo del ramo
-            entry_costo.delete(0, tk.END)
-            entry_costo.insert(0, pedido[6])  # Costo
+            entry_costo_dolares.delete(0, tk.END)
+            entry_costo_dolares.insert(0, pedido[6])  # Costo en Dolares
             entry_entrega.set_date(datetime.strptime(pedido[7].split()[0], "%Y-%m-%d").date())  # Fecha de entrega
             hora_entrega_var.set(pedido[7].split()[1])  # Hora de entrega
             entry_enviado_a.delete(0, tk.END)
@@ -335,7 +335,7 @@ def limpiar_campos():
     entry_telefono.delete(0, tk.END)
     entry_direccion.delete(0, tk.END)
     modelo_ramo_var.set("")
-    entry_costo.delete(0, tk.END)
+    entry_costo_dolares.delete(0, tk.END)
     entry_entrega.set_date(datetime.now().date())  # Establecer la fecha actual
     hora_entrega_var.set("08:00")  # Establecer una hora predeterminada
     entry_enviado_a.delete(0, tk.END)
@@ -351,7 +351,7 @@ def exportar_a_csv():
     try:
         with open("pedidos.csv", mode="w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
-            writer.writerow(["ID", "Fecha y Hora", "Cliente", "Teléfono", "Dirección", "Modelo del Ramo", "Costo", "Fecha y Hora Entrega", "Enviado a", "Descripcion", "Costo Adicional", "Numero de Factura" "Costo Total", "Estado"])
+            writer.writerow(["ID", "Fecha y Hora", "Cliente", "Teléfono", "Dirección", "Modelo del Ramo", "Costo en Dolares", "Fecha y Hora Entrega", "Enviado a", "Descripcion", "Costo Adicional", "Numero de Factura" "Costo Total", "Estado"])
             for row in tree.get_children():
                 writer.writerow(tree.item(row)['values'])
         messagebox.showinfo("Éxito", "Datos exportados correctamente a pedidos.csv")
@@ -605,7 +605,7 @@ entry_cliente = ttk.Entry(form_frame, width=40)
 entry_telefono = ttk.Entry(form_frame, width=20)
 entry_direccion = ttk.Entry(form_frame, width=60)
 modelo_ramo_var = tk.StringVar()  # Variable para el Combobox de modelos de ramos
-entry_costo = ttk.Entry(form_frame, width=20)
+entry_costo_dolares = ttk.Entry(form_frame, width=20)
 entry_entrega = DateEntry(form_frame, date_pattern='yyyy-MM-dd')
 hora_entrega_var = tk.StringVar()
 entry_enviado_a = ttk.Entry(form_frame, width=40)
@@ -620,7 +620,7 @@ estado_var = tk.StringVar()
 labels = [
     "Fecha del Pedido", "Hora del Pedido (HH:MM)", "Cliente",
     "Teléfono", "Modelo del Ramo",
-    "Costo", "Fecha de Entrega", "Hora de Entrega (HH:MM)", "Enviado a", "Teléfono Receptor", "Descripcion", "Costo Adicional", "Numero de Factura"
+    "Costo en Dolares", "Fecha de Entrega", "Hora de Entrega (HH:MM)", "Enviado a", "Teléfono Receptor", "Descripcion", "Costo Adicional", "Numero de Factura"
 ]
 row_index = 0  # Índice para controlar las filas
 for i, text in enumerate(labels):
@@ -638,7 +638,7 @@ for i, text in enumerate(labels):
         ttk.Label(form_frame, text=text, anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
         modelo_ramo_combobox = ttk.Combobox(form_frame, textvariable=modelo_ramo_var, state="readonly", width=40)
         modelo_ramo_combobox.grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
-        modelo_ramo_combobox.bind("<<ComboboxSelected>>", actualizar_costo)  # Actualizar costo al seleccionar un modelo
+        modelo_ramo_combobox.bind("<<ComboboxSelected>>", actualizar_costo_dolares)  # Actualizar costo en dolares al seleccionar un modelo
         row_index += 1
     elif "Fecha" in text:
         # Entradas para fechas
@@ -680,8 +680,8 @@ for i, text in enumerate(labels):
         ttk.Label(form_frame, text=text, anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
         if text == "Cliente":
             entry_cliente.grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
-        elif text == "Costo":
-            entry_costo.grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
+        elif text == "Costo en Dolares":
+            entry_costo_dolares.grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
         elif text == "Costo Adicional":
             entry_costo_adicional.grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
         elif text == "Numero de Factura":
@@ -697,10 +697,10 @@ estado_combobox.grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
 estado_combobox.current(0)
 row_index += 1
 
-# Campo para el costo acumulado
-costo_acumulado_var = tk.DoubleVar(value=0.0)
-ttk.Label(form_frame, text="Costo Acumulado:", anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
-ttk.Label(form_frame, textvariable=costo_acumulado_var, anchor="w").grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
+# Campo para el costo en dolares acumulado
+costo_dolares_acumulado_var = tk.DoubleVar(value=0.0)
+ttk.Label(form_frame, text="Costo en Dolares Acumulado:", anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
+ttk.Label(form_frame, textvariable=costo_dolares_acumulado_var, anchor="w").grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
 row_index += 1
 
 # Campo para el costo acumulado sin cuentas por cobrar
@@ -737,7 +737,7 @@ ttk.Button(search_frame, text="Buscar", command=buscar_pedidos).pack(side="left"
 # Tabla de pedidos
 tree_frame = ttk.Frame(main_frame)
 tree_frame.pack(fill="both", expand=True, pady=10)
-tree = ttk.Treeview(tree_frame, columns=("ID", "Fecha y Hora", "Cliente", "Teléfono Remitente", "Dirección", "Modelo del Ramo", "Costo", "Fecha y Hora Entrega", "Enviado a", "Teléfono Receptor", "Descripcion", "Costo Adicional", "Numero de Factura", "Costo Total", "Estado"), show="headings")
+tree = ttk.Treeview(tree_frame, columns=("ID", "Fecha y Hora", "Cliente", "Teléfono Remitente", "Dirección", "Modelo del Ramo", "Costo en Dolares", "Fecha y Hora Entrega", "Enviado a", "Teléfono Receptor", "Descripcion", "Costo Adicional", "Numero de Factura", "Costo Total", "Estado"), show="headings")
 for col in tree['columns']:
     tree.heading(col, text=col)
     tree.column(col, width=120, anchor="center")
@@ -752,8 +752,8 @@ mostrar_pedidos()
 # Cargar los modelos de ramos en el Combobox
 cargar_modelos_ramos()
 
-# Calcular el costo acumulado inicial
-calcular_costo_acumulado()
+# Calcular el costo en dolares acumulado inicial
+calcular_costo_dolares_acumulado()
 
 # Calcular el costo acumulado sin cuentas por cobrar inicial
 calcular_costo_acumulado_sin_cuentas_por_cobrar()
