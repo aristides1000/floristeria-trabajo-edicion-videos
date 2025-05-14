@@ -17,7 +17,6 @@ def crear_base_datos():
             cliente TEXT,
             telefono TEXT,
             direccion TEXT,
-            forma_pago TEXT,
             modelo_ramo TEXT,
             costo REAL,
             fecha_hora_entrega TEXT,

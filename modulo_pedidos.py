@@ -24,7 +24,6 @@ def conectar_db():
                         cliente TEXT,
                         telefono TEXT,
                         direccion TEXT,
-                        forma_pago TEXT,
                         modelo_ramo TEXT,
                         costo REAL,
                         fecha_hora_entrega TEXT,
@@ -134,7 +133,7 @@ def agregar_pedido():
     estado = estado_var.get()
     modelo_ramo = modelo_ramo_var.get()  # Obtener el modelo seleccionado
     # Validar campos obligatorios
-    if not (entry_cliente.get() and entry_direccion.get() and forma_pago_var.get() and modelo_ramo and entry_costo.get()):
+    if not (entry_cliente.get() and entry_direccion.get() and modelo_ramo and entry_costo.get()):
         messagebox.showerror("Error", "Todos los campos son obligatorios.")
         return
     try:
@@ -163,9 +162,8 @@ def agregar_pedido():
     try:
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO pedidos (fecha_hora, cliente, telefono, direccion, forma_pago, modelo_ramo, costo, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional, numero_factura, costo_total, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                       (fecha_hora, entry_cliente.get(), telefono_completo, entry_direccion.get(),
-                        forma_pago_var.get(), modelo_ramo, costo, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional, numero_factura, costo_total, estado))
+        cursor.execute("INSERT INTO pedidos (fecha_hora, cliente, telefono, direccion, modelo_ramo, costo, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional, numero_factura, costo_total, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                       (fecha_hora, entry_cliente.get(), telefono_completo, entry_direccion.get(), modelo_ramo, costo, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional, numero_factura, costo_total, estado))
         conn.commit()
     except sqlite3.Error as e:
         messagebox.showerror("Error", f"Ocurrió un error al agregar el pedido: {e}")
@@ -193,7 +191,7 @@ def modificar_pedido():
     estado = estado_var.get()
     modelo_ramo = modelo_ramo_var.get()  # Obtener el modelo seleccionado
     # Validar campos obligatorios
-    if not (entry_cliente.get() and entry_direccion.get() and forma_pago_var.get() and modelo_ramo and entry_costo.get()):
+    if not (entry_cliente.get() and entry_direccion.get() and modelo_ramo and entry_costo.get()):
         messagebox.showerror("Error", "Todos los campos son obligatorios.")
         return
     try:
@@ -223,9 +221,8 @@ def modificar_pedido():
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
         pedido_id = tree.item(selected_item)['values'][0]
-        cursor.execute("UPDATE pedidos SET fecha_hora=?, cliente=?, telefono=?, direccion=?, forma_pago=?, modelo_ramo=?, costo=?, fecha_hora_entrega=?, enviado_a=?, telefono_receptor=?, descripcion=?, costo_adicional=?, numero_factura=?, costo_total=?, estado=? WHERE id=?",
-                       (fecha_hora, entry_cliente.get(), telefono_completo, entry_direccion.get(),
-                        forma_pago_var.get(), modelo_ramo, costo, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional, numero_factura, costo_total, estado, pedido_id))
+        cursor.execute("UPDATE pedidos SET fecha_hora=?, cliente=?, telefono=?, direccion=?, modelo_ramo=?, costo=?, fecha_hora_entrega=?, enviado_a=?, telefono_receptor=?, descripcion=?, costo_adicional=?, numero_factura=?, costo_total=?, estado=? WHERE id=?",
+                       (fecha_hora, entry_cliente.get(), telefono_completo, entry_direccion.get(), modelo_ramo, costo, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional, numero_factura, costo_total, estado, pedido_id))
         conn.commit()
     except sqlite3.Error as e:
         messagebox.showerror("Error", f"Ocurrió un error al modificar el pedido: {e}")
@@ -270,7 +267,7 @@ def mostrar_pedidos():
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
         """ cursor.execute("SELECT * FROM pedidos") """
-        cursor.execute("SELECT id, fecha_hora, cliente, telefono, direccion, forma_pago, modelo_ramo, costo, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional, numero_factura, costo_total, estado FROM pedidos;")
+        cursor.execute("SELECT id, fecha_hora, cliente, telefono, direccion, modelo_ramo, costo, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional, numero_factura, costo_total, estado FROM pedidos;")
         rows = cursor.fetchall()
         # Definir tags para los colores de fondo
         tree.tag_configure("en_proceso", background="#33f6ff")  # azul claro
@@ -309,25 +306,24 @@ def cargar_pedido(event):
             entry_telefono.insert(0, telefono_completo)  # Mostrar el teléfono tal como está
             entry_direccion.delete(0, tk.END)
             entry_direccion.insert(0, pedido[4])  # Dirección
-            forma_pago_var.set(pedido[5])  # Forma de pago
-            modelo_ramo_var.set(pedido[6])  # Modelo del ramo
+            modelo_ramo_var.set(pedido[5])  # Modelo del ramo
             entry_costo.delete(0, tk.END)
-            entry_costo.insert(0, pedido[7])  # Costo
-            entry_entrega.set_date(datetime.strptime(pedido[8].split()[0], "%Y-%m-%d").date())  # Fecha de entrega
-            hora_entrega_var.set(pedido[8].split()[1])  # Hora de entrega
+            entry_costo.insert(0, pedido[6])  # Costo
+            entry_entrega.set_date(datetime.strptime(pedido[7].split()[0], "%Y-%m-%d").date())  # Fecha de entrega
+            hora_entrega_var.set(pedido[7].split()[1])  # Hora de entrega
             entry_enviado_a.delete(0, tk.END)
-            entry_enviado_a.insert(0, pedido[9])  # Enviado a
+            entry_enviado_a.insert(0, pedido[8])  # Enviado a
             entry_telefono_receptor.delete(0, tk.END)
-            entry_telefono_receptor.insert(0, f"+{pedido[10]}")
+            entry_telefono_receptor.insert(0, f"+{pedido[9]}")
             entry_descripcion.delete(0, tk.END)
-            entry_descripcion.insert(0, pedido[11])
+            entry_descripcion.insert(0, pedido[10])
             entry_costo_adicional.delete(0, tk.END)
-            entry_costo_adicional.insert(0, pedido[12])  # Costo Adicional
+            entry_costo_adicional.insert(0, pedido[11])  # Costo Adicional
             entry_numero_factura.delete(0, tk.END)
-            entry_numero_factura.insert(0, pedido[13])  # Numero Factura
+            entry_numero_factura.insert(0, pedido[12])  # Numero Factura
             entry_costo_total.delete(0, tk.END)
-            entry_costo_total.insert(0, pedido[14])  # Costo Total
-            estado_var.set(pedido[15])  # Estado del pedido
+            entry_costo_total.insert(0, pedido[13])  # Costo Total
+            estado_var.set(pedido[14])  # Estado del pedido
         except Exception as e:
             messagebox.showerror("Error", f"Ocurrió un error al cargar los datos: {e}")
 
@@ -338,7 +334,6 @@ def limpiar_campos():
     entry_cliente.delete(0, tk.END)
     entry_telefono.delete(0, tk.END)
     entry_direccion.delete(0, tk.END)
-    forma_pago_var.set("")
     modelo_ramo_var.set("")
     entry_costo.delete(0, tk.END)
     entry_entrega.set_date(datetime.now().date())  # Establecer la fecha actual
@@ -356,7 +351,7 @@ def exportar_a_csv():
     try:
         with open("pedidos.csv", mode="w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
-            writer.writerow(["ID", "Fecha y Hora", "Cliente", "Teléfono", "Dirección", "Forma de Pago", "Modelo del Ramo", "Costo", "Fecha y Hora Entrega", "Enviado a", "Descripcion", "Costo Adicional", "Numero de Factura" "Costo Total", "Estado"])
+            writer.writerow(["ID", "Fecha y Hora", "Cliente", "Teléfono", "Dirección", "Modelo del Ramo", "Costo", "Fecha y Hora Entrega", "Enviado a", "Descripcion", "Costo Adicional", "Numero de Factura" "Costo Total", "Estado"])
             for row in tree.get_children():
                 writer.writerow(tree.item(row)['values'])
         messagebox.showinfo("Éxito", "Datos exportados correctamente a pedidos.csv")
@@ -609,7 +604,6 @@ hora_var = tk.StringVar()
 entry_cliente = ttk.Entry(form_frame, width=40)
 entry_telefono = ttk.Entry(form_frame, width=20)
 entry_direccion = ttk.Entry(form_frame, width=60)
-forma_pago_var = tk.StringVar()
 modelo_ramo_var = tk.StringVar()  # Variable para el Combobox de modelos de ramos
 entry_costo = ttk.Entry(form_frame, width=20)
 entry_entrega = DateEntry(form_frame, date_pattern='yyyy-MM-dd')
@@ -625,7 +619,7 @@ estado_var = tk.StringVar()
 # Bucle para crear los campos del formulario
 labels = [
     "Fecha del Pedido", "Hora del Pedido (HH:MM)", "Cliente",
-    "Teléfono", "Forma de Pago", "Modelo del Ramo",
+    "Teléfono", "Modelo del Ramo",
     "Costo", "Fecha de Entrega", "Hora de Entrega (HH:MM)", "Enviado a", "Teléfono Receptor", "Descripcion", "Costo Adicional", "Numero de Factura"
 ]
 row_index = 0  # Índice para controlar las filas
@@ -639,13 +633,6 @@ for i, text in enumerate(labels):
         ttk.Label(form_frame, text="Dirección", anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
         entry_direccion.grid(row=row_index, column=1, columnspan=3, padx=5, pady=5, sticky="ew")  # Expandir horizontalmente
         row_index += 1  # Incrementar fila para la siguiente entrada
-    elif text == "Forma de Pago":
-        # Combobox para la forma de pago
-        ttk.Label(form_frame, text=text, anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
-        forma_pago_combobox = ttk.Combobox(form_frame, textvariable=forma_pago_var, values=["Transferencia", "PagoMóvil", "Efectivo", "Zelle", "Por Cobrar"], state="readonly", width=20)
-        forma_pago_combobox.grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
-        forma_pago_combobox.current(0)
-        row_index += 1
     elif text == "Modelo del Ramo":
         # Combobox para seleccionar el modelo del ramo
         ttk.Label(form_frame, text=text, anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
@@ -750,7 +737,7 @@ ttk.Button(search_frame, text="Buscar", command=buscar_pedidos).pack(side="left"
 # Tabla de pedidos
 tree_frame = ttk.Frame(main_frame)
 tree_frame.pack(fill="both", expand=True, pady=10)
-tree = ttk.Treeview(tree_frame, columns=("ID", "Fecha y Hora", "Cliente", "Teléfono Remitente", "Dirección", "Forma de Pago", "Modelo del Ramo", "Costo", "Fecha y Hora Entrega", "Enviado a", "Teléfono Receptor", "Descripcion", "Costo Adicional", "Numero de Factura", "Costo Total", "Estado"), show="headings")
+tree = ttk.Treeview(tree_frame, columns=("ID", "Fecha y Hora", "Cliente", "Teléfono Remitente", "Dirección", "Modelo del Ramo", "Costo", "Fecha y Hora Entrega", "Enviado a", "Teléfono Receptor", "Descripcion", "Costo Adicional", "Numero de Factura", "Costo Total", "Estado"), show="headings")
 for col in tree['columns']:
     tree.heading(col, text=col)
     tree.column(col, width=120, anchor="center")
