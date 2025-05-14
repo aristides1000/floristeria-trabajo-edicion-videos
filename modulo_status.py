@@ -21,6 +21,8 @@ def conectar_db():
                     enviado_a TEXT,
                     telefono_receptor TEXT,
                     descripcion TEXT,
+                    tipo_entrega TEXT,
+                    delivery_persona TEXT,
                     costo_adicional REAL,
                     costo_total REAL,
                     numero_factura INTEGER NOT NULL,
