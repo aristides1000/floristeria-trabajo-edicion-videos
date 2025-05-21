@@ -38,6 +38,7 @@ def conectar_db():
                         costo_adicional_bolivares REAL,
                         costo_adicional_por_cobrar REAL,
                         costo_total_dolares REAL,
+                        costo_total_bolivares REAL,
                         numero_factura INTEGER NOT NULL,
                         estado TEXT)''')
     # Crear tabla de modelos de ramos si no existe
@@ -137,7 +138,7 @@ def agregar_pedido():
     estado = estado_var.get()
     modelo_ramo = modelo_ramo_var.get()  # Obtener el modelo seleccionado
     # Validar campos obligatorios
-    if not (entry_cliente.get() and entry_direccion.get() and modelo_ramo and entry_costo_dolares.get()):
+    if not (entry_cliente.get() and entry_direccion.get() and modelo_ramo and (entry_costo_dolares.get() or entry_costo_bolivares.get() or entry_costo_por_cobrar.get())):
         messagebox.showerror("Error", "Todos los campos son obligatorios.")
         return
     try:
@@ -188,10 +189,16 @@ def agregar_pedido():
         messagebox.showerror("Error", "El costo total en dolares debe ser un número válido.")
         return
     try:
+        # Convertir el costo total en bolivares a float
+        costo_total_bolivares = float(costo_bolivares + costo_adicional_bolivares)
+    except ValueError:
+        messagebox.showerror("Error", "El costo total en bolivares debe ser un número válido.")
+        return
+    try:
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO pedidos (fecha_hora, cliente, telefono, direccion, modelo_ramo, costo_dolares, costo_bolivares, costo_por_cobrar, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional_dolares, costo_adicional_bolivares, costo_adicional_por_cobrar, numero_factura, costo_total_dolares, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                        (fecha_hora, entry_cliente.get(), telefono_completo, entry_direccion.get(), modelo_ramo, costo_dolares, costo_bolivares, costo_por_cobrar, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional_dolares, costo_adicional_bolivares, costo_adicional_por_cobrar, numero_factura, costo_total_dolares, estado))
+        cursor.execute("INSERT INTO pedidos (fecha_hora, cliente, telefono, direccion, modelo_ramo, costo_dolares, costo_bolivares, costo_por_cobrar, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional_dolares, costo_adicional_bolivares, costo_adicional_por_cobrar, numero_factura, costo_total_dolares, costo_total_bolivares, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        (fecha_hora, entry_cliente.get(), telefono_completo, entry_direccion.get(), modelo_ramo, costo_dolares, costo_bolivares, costo_por_cobrar, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional_dolares, costo_adicional_bolivares, costo_adicional_por_cobrar, numero_factura, costo_total_dolares, costo_total_bolivares, estado))
         conn.commit()
     except sqlite3.Error as e:
         messagebox.showerror("Error", f"Ocurrió un error al agregar el pedido: {e}")
@@ -219,7 +226,7 @@ def modificar_pedido():
     estado = estado_var.get()
     modelo_ramo = modelo_ramo_var.get()  # Obtener el modelo seleccionado
     # Validar campos obligatorios
-    if not (entry_cliente.get() and entry_direccion.get() and modelo_ramo and entry_costo_dolares.get()):
+    if not (entry_cliente.get() and entry_direccion.get() and modelo_ramo and (entry_costo_dolares.get() or entry_costo_bolivares.get() or entry_costo_por_cobrar.get())):
         messagebox.showerror("Error", "Todos los campos son obligatorios.")
         return
     try:
@@ -270,11 +277,17 @@ def modificar_pedido():
         messagebox.showerror("Error", "El costo total en dolares debe ser un número válido.")
         return
     try:
+        # Convertir el costo_total_bolivares a float
+        costo_total_bolivares = float(costo_bolivares + costo_adicional_bolivares)
+    except ValueError:
+        messagebox.showerror("Error", "El costo total en bolivares debe ser un número válido.")
+        return
+    try:
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
         pedido_id = tree.item(selected_item)['values'][0]
-        cursor.execute("UPDATE pedidos SET fecha_hora=?, cliente=?, telefono=?, direccion=?, modelo_ramo=?, costo_dolares=?, costo_bolivares=?, costo_por_cobrar=?, fecha_hora_entrega=?, enviado_a=?, telefono_receptor=?, descripcion=?, costo_adicional_dolares=?, costo_adicional_bolivares=?, costo_adicional_por_cobrar=?, numero_factura=?, costo_total_dolares=?, estado=? WHERE id=?",
-                        (fecha_hora, entry_cliente.get(), telefono_completo, entry_direccion.get(), modelo_ramo, costo_dolares, costo_bolivares, costo_por_cobrar, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional_dolares, costo_adicional_bolivares, costo_adicional_por_cobrar, numero_factura, costo_total_dolares, estado, pedido_id))
+        cursor.execute("UPDATE pedidos SET fecha_hora=?, cliente=?, telefono=?, direccion=?, modelo_ramo=?, costo_dolares=?, costo_bolivares=?, costo_por_cobrar=?, fecha_hora_entrega=?, enviado_a=?, telefono_receptor=?, descripcion=?, costo_adicional_dolares=?, costo_adicional_bolivares=?, costo_adicional_por_cobrar=?, numero_factura=?, costo_total_dolares=?, costo_total_bolivares=?, estado=? WHERE id=?",
+                        (fecha_hora, entry_cliente.get(), telefono_completo, entry_direccion.get(), modelo_ramo, costo_dolares, costo_bolivares, costo_por_cobrar, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional_dolares, costo_adicional_bolivares, costo_adicional_por_cobrar, numero_factura, costo_total_dolares, costo_total_bolivares, estado, pedido_id))
         conn.commit()
     except sqlite3.Error as e:
         messagebox.showerror("Error", f"Ocurrió un error al modificar el pedido: {e}")
@@ -319,7 +332,7 @@ def mostrar_pedidos():
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
         """ cursor.execute("SELECT * FROM pedidos") """
-        cursor.execute("SELECT id, fecha_hora, cliente, telefono, direccion, modelo_ramo, costo_dolares, costo_bolivares, costo_por_cobrar, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional_dolares, costo_adicional_bolivares, costo_adicional_por_cobrar, numero_factura, costo_total_dolares, estado FROM pedidos;")
+        cursor.execute("SELECT id, fecha_hora, cliente, telefono, direccion, modelo_ramo, costo_dolares, costo_bolivares, costo_por_cobrar, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional_dolares, costo_adicional_bolivares, costo_adicional_por_cobrar, numero_factura, costo_total_dolares, costo_total_bolivares, estado FROM pedidos;")
         rows = cursor.fetchall()
         # Definir tags para los colores de fondo
         tree.tag_configure("en_proceso", background="#33f6ff")  # azul claro
@@ -327,7 +340,7 @@ def mostrar_pedidos():
         tree.tag_configure("armado", background="#f5ef42")      # amarillo
         for row in rows:
             # Determinar el tag según el estado del pedido
-            estado = row[18]  # Última columna: estado
+            estado = row[19]  # Última columna: estado
             if (estado == "En Proceso"):
                 tag = "en_proceso"
             elif (estado == "Enviado"):
@@ -383,7 +396,9 @@ def cargar_pedido(event):
             entry_numero_factura.insert(0, pedido[16])  # Numero Factura
             entry_costo_total_dolares.delete(0, tk.END)
             entry_costo_total_dolares.insert(0, pedido[17])  # Costo Total en Dolares
-            estado_var.set(pedido[18])  # Estado del pedido
+            entry_costo_total_bolivares.delete(0, tk.END)
+            entry_costo_total_bolivares.insert(0, pedido[18])  # Costo Total en Bolivares
+            estado_var.set(pedido[19])  # Estado del pedido
         except Exception as e:
             messagebox.showerror("Error", f"Ocurrió un error al cargar los datos: {e}")
 
@@ -408,6 +423,7 @@ def limpiar_campos():
     entry_costo_adicional_por_cobrar.delete(0, tk.END)
     entry_numero_factura.delete(0, tk.END)
     entry_costo_total_dolares.delete(0, tk.END)
+    entry_costo_total_bolivares.delete(0, tk.END)
     estado_var.set("En Proceso")  # Estado predeterminado
 
 # Función para exportar datos a CSV
@@ -415,7 +431,7 @@ def exportar_a_csv():
     try:
         with open("pedidos.csv", mode="w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
-            writer.writerow(["ID", "Fecha y Hora", "Cliente", "Teléfono", "Dirección", "Modelo del Ramo", "Costo en Dolares", "Costo en Bolivares", "Costo por Cobrar", "Fecha y Hora Entrega", "Enviado a", "Descripcion", "Costo Adicional en Dolares", "Costo Adicional en Bolivares", "Costo Adicional por Cobrar", "Numero de Factura" "Costo Total en Dolares", "Estado"])
+            writer.writerow(["ID", "Fecha y Hora", "Cliente", "Teléfono", "Dirección", "Modelo del Ramo", "Costo en Dolares", "Costo en Bolivares", "Costo por Cobrar", "Fecha y Hora Entrega", "Enviado a", "Descripcion", "Costo Adicional en Dolares", "Costo Adicional en Bolivares", "Costo Adicional por Cobrar", "Numero de Factura", "Costo Total en Dolares", "Costo Total en Bolivares", "Estado"])
             for row in tree.get_children():
                 writer.writerow(tree.item(row)['values'])
         messagebox.showinfo("Éxito", "Datos exportados correctamente a pedidos.csv")
@@ -442,7 +458,7 @@ def buscar_pedidos():
 def abrir_gestion_modelos():
     def agregar_modelo():
         # Validar campos obligatorios
-        if not (entry_nombre.get() and entry_rosas.get() and entry_flores.get() and entry_extras.get() and entry_precio.get()):
+        if not (entry_nombre.get() and entry_rosas.get() and entry_flores.get() and entry_extras.get()):
             messagebox.showerror("Error", "Todos los campos son obligatorios.")
             return
         try:
@@ -682,6 +698,7 @@ entry_costo_adicional_bolivares = ttk.Entry(form_frame, width=20)
 entry_costo_adicional_por_cobrar = ttk.Entry(form_frame, width=20)
 entry_numero_factura = ttk.Entry(form_frame, width=10)
 entry_costo_total_dolares = ttk.Entry(form_frame, width=20, state="disabled")
+entry_costo_total_bolivares = ttk.Entry(form_frame, width=20, state="disabled")
 estado_var = tk.StringVar()
 
 # Bucle para crear los campos del formulario
@@ -764,6 +781,8 @@ for i, text in enumerate(labels):
             entry_numero_factura.grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
         """ elif text == "Costo Total en Dolares":
             entry_costo_total_dolares.grid(row=row_index, column=1, padx=5, pady=5, sticky="w") """
+        """ elif text == "Costo Total en Bolivares":
+            entry_costo_total_bolivares.grid(row=row_index, column=1, padx=5, pady=5, sticky="w") """
         row_index += 1
 
 # Campo de estado
@@ -813,7 +832,7 @@ ttk.Button(search_frame, text="Buscar", command=buscar_pedidos).pack(side="left"
 # Tabla de pedidos
 tree_frame = ttk.Frame(main_frame)
 tree_frame.pack(fill="both", expand=True, pady=10)
-tree = ttk.Treeview(tree_frame, columns=("ID", "Fecha y Hora", "Cliente", "Teléfono Remitente", "Dirección", "Modelo del Ramo", "Costo en Dolares", "Costo en Bolivares", "Costo por Cobrar", "Fecha y Hora Entrega", "Enviado a", "Teléfono Receptor", "Descripcion", "Costo Adicional en Dolares", "Costo Adicional en Bolivares", "Costo Adicional por Cobrar", "Numero de Factura", "Costo Total en Dolares", "Estado"), show="headings")
+tree = ttk.Treeview(tree_frame, columns=("ID", "Fecha y Hora", "Cliente", "Teléfono Remitente", "Dirección", "Modelo del Ramo", "Costo en Dolares", "Costo en Bolivares", "Costo por Cobrar", "Fecha y Hora Entrega", "Enviado a", "Teléfono Receptor", "Descripcion", "Costo Adicional en Dolares", "Costo Adicional en Bolivares", "Costo Adicional por Cobrar", "Numero de Factura", "Costo Total en Dolares", "Costo Total en Bolivares", "Estado"), show="headings")
 for col in tree['columns']:
     tree.heading(col, text=col)
     tree.column(col, width=120, anchor="center")

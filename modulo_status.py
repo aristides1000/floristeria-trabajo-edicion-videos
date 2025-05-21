@@ -28,6 +28,7 @@ def conectar_db():
                     costo_adicional_bolivares REAL,
                     costo_adicional_por_cobrar REAL,
                     costo_total_dolares REAL,
+                    costo_total_bolivares REAL,
                     numero_factura INTEGER NOT NULL,
                     estado TEXT)''')
     conn.commit()
