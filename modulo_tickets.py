@@ -32,6 +32,7 @@ def crear_base_datos():
             costo_adicional_por_cobrar REAL,
             costo_total_dolares REAL,
             costo_total_bolivares REAL,
+            costo_total_por_cobrar REAL,
             numero_factura INTEGER NOT NULL,
             estado TEXT)''')
 
