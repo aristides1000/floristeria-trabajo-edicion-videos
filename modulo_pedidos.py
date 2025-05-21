@@ -100,31 +100,17 @@ def calcular_costo_dolares_acumulado():
     finally:
         conn.close()
 
-# Función para calcular el costo acumulado sin cuentas por cobrar
-def calcular_costo_acumulado_sin_cuentas_por_cobrar():
+# Función para calcular el costo en bolivares acumulado
+def calcular_costo_bolivares_acumulado():
     try:
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT SUM(costo + costo_adicional) FROM pedidos WHERE forma_pago <> 'Por Cobrar'")
+        cursor.execute("SELECT SUM(costo_bolivares + costo_adicional_bolivares) FROM pedidos")
         resultado = cursor.fetchone()[0]
-        costo_acumulado_cobrar = resultado if resultado else 0.0  # Si no hay pedidos, el costo es 0.0
-        costo_acumulado_cobrar_var.set(round(costo_acumulado_cobrar, 2))  # Actualizar la variable con el costo acumulado
+        costo_bolivares_acumulado = resultado if resultado else 0.0  # Si no hay pedidos, el costo es 0.0
+        costo_bolivares_acumulado_var.set(round(costo_bolivares_acumulado, 2))  # Actualizar la variable con el costo en bolivares acumulado
     except sqlite3.Error as e:
-        messagebox.showerror("Error", f"Ocurrió un error al calcular el costo acumulado sin cuentas cobrar: {e}")
-    finally:
-        conn.close()
-
-# Función para calcular el costo acumulado sin cuentas por cobrar
-def calcular_saldo_por_cobrar():
-    try:
-        conn = sqlite3.connect("floristeria.db")
-        cursor = conn.cursor()
-        cursor.execute("SELECT SUM(costo + costo_adicional) FROM pedidos WHERE forma_pago = 'Por Cobrar'")
-        resultado = cursor.fetchone()[0]
-        costo_saldo_cobrar = resultado if resultado else 0.0  # Si no hay pedidos, el costo es 0.0
-        costo_saldo_cobrar_var.set(round(costo_saldo_cobrar, 2))  # Actualizar la variable con el costo acumulado
-    except sqlite3.Error as e:
-        messagebox.showerror("Error", f"Ocurrió un error al calcular el costo sin cobrar: {e}")
+        messagebox.showerror("Error", f"Ocurrió un error al calcular el costo en bolivares acumulado: {e}")
     finally:
         conn.close()
 
@@ -214,8 +200,7 @@ def agregar_pedido():
     limpiar_campos()
     mostrar_pedidos()
     calcular_costo_dolares_acumulado() # Calcular el costo en dolares acumulado después de agregar un pedido
-    calcular_costo_acumulado_sin_cuentas_por_cobrar() # Calcular el costo acumulado sin cuentas por cobrar después de agregar un pedido
-    calcular_saldo_por_cobrar() # Calcular el costo de saldo por cobrar después de agregar un pedido
+    calcular_costo_bolivares_acumulado() # Calcular el costo en bolivares acumulado después de agregar un pedido
     messagebox.showinfo("Éxito", "Pedido agregado correctamente.")
 
 # Función para modificar un pedido
@@ -308,9 +293,9 @@ def modificar_pedido():
         conn.close()
     limpiar_campos()
     mostrar_pedidos()
-    calcular_costo_dolares_acumulado()  # Calcular el costo acumulado después de modificar un pedido
-    calcular_costo_acumulado_sin_cuentas_por_cobrar() # Calcular el costo acumulado sin cuentas por cobrar después de modificara un pedido
-    calcular_saldo_por_cobrar() # Calcular el costo de saldo por cobrar después de modificar un pedido
+    calcular_costo_dolares_acumulado()  # Calcular el costo acumulado en dolares después de modificar un pedido
+    calcular_costo_bolivares_acumulado()  # Calcular el costo acumulado en bolivares después de modificar un pedido
+
     messagebox.showinfo("Éxito", "Pedido modificado correctamente.")
 
 # Función para eliminar un pedido
@@ -332,8 +317,8 @@ def eliminar_pedido():
     limpiar_campos()
     mostrar_pedidos()
     calcular_costo_dolares_acumulado()  # Calcular el costo en dolares acumulado después de eliminar un pedido
-    calcular_costo_acumulado_sin_cuentas_por_cobrar() # Calcular el costo acumulado sin cuentas por cobrar después de eliminar un pedido
-    calcular_saldo_por_cobrar() # Calcular el costo de saldo por cobrar después de eliminar un pedido
+    calcular_costo_bolivares_acumulado()  # Calcular el costo en bolivares acumulado después de eliminar un pedido
+
     messagebox.showinfo("Éxito", "Pedido eliminado correctamente.")
 
 # Función para mostrar los pedidos en la tabla
@@ -817,10 +802,10 @@ ttk.Label(form_frame, text="Costo en Dolares Acumulado:", anchor="w").grid(row=r
 ttk.Label(form_frame, textvariable=costo_dolares_acumulado_var, anchor="w").grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
 row_index += 1
 
-# Campo para el costo acumulado sin cuentas por cobrar
-costo_acumulado_cobrar_var = tk.DoubleVar(value=0.0)
-ttk.Label(form_frame, text="Costo Acumulado sin cuentas por cobrar:", anchor="w").grid(row=row_index - 1, column=2, padx=5, pady=5, sticky="w")
-ttk.Label(form_frame, textvariable=costo_acumulado_cobrar_var, anchor="w").grid(row=row_index - 1, column=3, padx=5, pady=5, sticky="w")
+# Campo para el costo en bolivares acumulado
+costo_bolivares_acumulado_var = tk.DoubleVar(value=0.0)
+ttk.Label(form_frame, text="Costo en Bolivares Acumulado:", anchor="w").grid(row=row_index - 1, column=2, padx=5, pady=5, sticky="w")
+ttk.Label(form_frame, textvariable=costo_bolivares_acumulado_var, anchor="w").grid(row=row_index - 1, column=3, padx=5, pady=5, sticky="w")
 row_index += 1
 
 # Campo para el costo saldo por cobrar
@@ -869,11 +854,8 @@ cargar_modelos_ramos()
 # Calcular el costo en dolares acumulado inicial
 calcular_costo_dolares_acumulado()
 
-# Calcular el costo acumulado sin cuentas por cobrar inicial
-calcular_costo_acumulado_sin_cuentas_por_cobrar()
-
-# Calcular el saldo por cobrar inicial
-calcular_saldo_por_cobrar()
+# Calcular el costo en bolivares acumulado inicial
+calcular_costo_bolivares_acumulado()
 
 # Ejecutar la aplicación
 root.mainloop()
