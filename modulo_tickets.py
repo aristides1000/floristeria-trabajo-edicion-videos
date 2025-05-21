@@ -20,6 +20,7 @@ def crear_base_datos():
             modelo_ramo TEXT,
             costo_dolares REAL,
             costo_bolivares REAL,
+            costo_por_cobrar REAL,
             fecha_hora_entrega TEXT,
             enviado_a TEXT,
             telefono_receptor TEXT,
