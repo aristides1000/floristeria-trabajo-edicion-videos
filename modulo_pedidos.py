@@ -34,7 +34,7 @@ def conectar_db():
                         descripcion TEXT,
                         tipo_entrega TEXT,
                         delivery_persona TEXT,
-                        costo_adicional REAL,
+                        costo_adicional_dolares REAL,
                         costo_total REAL,
                         numero_factura INTEGER NOT NULL,
                         estado TEXT)''')
@@ -87,7 +87,7 @@ def calcular_costo_dolares_acumulado():
     try:
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
-        cursor.execute("SELECT SUM(costo_dolares + costo_adicional) FROM pedidos")
+        cursor.execute("SELECT SUM(costo_dolares + costo_adicional_dolares) FROM pedidos")
         resultado = cursor.fetchone()[0]
         costo_dolares_acumulado = resultado if resultado else 0.0  # Si no hay pedidos, el costo es 0.0
         costo_dolares_acumulado_var.set(round(costo_dolares_acumulado, 2))  # Actualizar la variable con el costo en dolares acumulado
@@ -157,10 +157,10 @@ def agregar_pedido():
         messagebox.showerror("Error", "El costo por cobrar debe ser un número válido.")
         return
     try:
-        # Convertir el costo_adicional a float
-        costo_adicional = float(0 if (entry_costo_adicional.get() == "") else entry_costo_adicional.get())
+        # Convertir el costo_adicional_dolares a float
+        costo_adicional_dolares = float(0 if (entry_costo_adicional_dolares.get() == "") else entry_costo_adicional_dolares.get())
     except ValueError:
-        messagebox.showerror("Error", "El costo adicional debe ser un número válido.")
+        messagebox.showerror("Error", "El costo adicional en dolares debe ser un número válido.")
         return
     try:
         numero_factura = int(entry_numero_factura.get())
@@ -168,16 +168,16 @@ def agregar_pedido():
         messagebox.showerror("Error", "El numero de factura debe ser un número válido.")
         return
     try:
-        # Convertir el costo_adicional a float
-        costo_total = float(costo_dolares + costo_adicional)
+        # Convertir el costo total en dolares a float
+        costo_total = float(costo_dolares + costo_adicional_dolares)
     except ValueError:
         messagebox.showerror("Error", "El costo total en dolares debe ser un número válido.")
         return
     try:
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
-        cursor.execute("INSERT INTO pedidos (fecha_hora, cliente, telefono, direccion, modelo_ramo, costo_dolares, costo_bolivares, costo_por_cobrar, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional, numero_factura, costo_total, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                       (fecha_hora, entry_cliente.get(), telefono_completo, entry_direccion.get(), modelo_ramo, costo_dolares, costo_bolivares, costo_por_cobrar, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional, numero_factura, costo_total, estado))
+        cursor.execute("INSERT INTO pedidos (fecha_hora, cliente, telefono, direccion, modelo_ramo, costo_dolares, costo_bolivares, costo_por_cobrar, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional_dolares, numero_factura, costo_total, estado) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                       (fecha_hora, entry_cliente.get(), telefono_completo, entry_direccion.get(), modelo_ramo, costo_dolares, costo_bolivares, costo_por_cobrar, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional_dolares, numero_factura, costo_total, estado))
         conn.commit()
     except sqlite3.Error as e:
         messagebox.showerror("Error", f"Ocurrió un error al agregar el pedido: {e}")
@@ -227,8 +227,8 @@ def modificar_pedido():
         messagebox.showerror("Error", "El costo por cobrar debe ser un número válido.")
         return
     try:
-        # Convertir el costo_adicional a float
-        costo_adicional = float(0 if (entry_costo_adicional.get() == "") else entry_costo_adicional.get())
+        # Convertir el costo_adicional_dolares a float
+        costo_adicional_dolares = float(0 if (entry_costo_adicional_dolares.get() == "") else entry_costo_adicional_dolares.get())
     except ValueError:
         messagebox.showerror("Error", "El costo adicional debe ser un número válido.")
         return
@@ -239,7 +239,7 @@ def modificar_pedido():
         return
     try:
         # Convertir el costo_total a float
-        costo_total = float(costo_dolares + costo_adicional)
+        costo_total = float(costo_dolares + costo_adicional_dolares)
     except ValueError:
         messagebox.showerror("Error", "El costo total debe ser un número válido.")
         return
@@ -247,8 +247,8 @@ def modificar_pedido():
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
         pedido_id = tree.item(selected_item)['values'][0]
-        cursor.execute("UPDATE pedidos SET fecha_hora=?, cliente=?, telefono=?, direccion=?, modelo_ramo=?, costo_dolares=?, costo_bolivares=?, costo_por_cobrar=?, fecha_hora_entrega=?, enviado_a=?, telefono_receptor=?, descripcion=?, costo_adicional=?, numero_factura=?, costo_total=?, estado=? WHERE id=?",
-                       (fecha_hora, entry_cliente.get(), telefono_completo, entry_direccion.get(), modelo_ramo, costo_dolares, costo_bolivares, costo_por_cobrar, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional, numero_factura, costo_total, estado, pedido_id))
+        cursor.execute("UPDATE pedidos SET fecha_hora=?, cliente=?, telefono=?, direccion=?, modelo_ramo=?, costo_dolares=?, costo_bolivares=?, costo_por_cobrar=?, fecha_hora_entrega=?, enviado_a=?, telefono_receptor=?, descripcion=?, costo_adicional_dolares=?, numero_factura=?, costo_total=?, estado=? WHERE id=?",
+                       (fecha_hora, entry_cliente.get(), telefono_completo, entry_direccion.get(), modelo_ramo, costo_dolares, costo_bolivares, costo_por_cobrar, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional_dolares, numero_factura, costo_total, estado, pedido_id))
         conn.commit()
     except sqlite3.Error as e:
         messagebox.showerror("Error", f"Ocurrió un error al modificar el pedido: {e}")
@@ -293,7 +293,7 @@ def mostrar_pedidos():
         conn = sqlite3.connect("floristeria.db")
         cursor = conn.cursor()
         """ cursor.execute("SELECT * FROM pedidos") """
-        cursor.execute("SELECT id, fecha_hora, cliente, telefono, direccion, modelo_ramo, costo_dolares, costo_bolivares, costo_por_cobrar, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional, numero_factura, costo_total, estado FROM pedidos;")
+        cursor.execute("SELECT id, fecha_hora, cliente, telefono, direccion, modelo_ramo, costo_dolares, costo_bolivares, costo_por_cobrar, fecha_hora_entrega, enviado_a, telefono_receptor, descripcion, costo_adicional_dolares, numero_factura, costo_total, estado FROM pedidos;")
         rows = cursor.fetchall()
         # Definir tags para los colores de fondo
         tree.tag_configure("en_proceso", background="#33f6ff")  # azul claro
@@ -347,8 +347,8 @@ def cargar_pedido(event):
             entry_telefono_receptor.insert(0, f"+{pedido[11]}")
             entry_descripcion.delete(0, tk.END)
             entry_descripcion.insert(0, pedido[12])
-            entry_costo_adicional.delete(0, tk.END)
-            entry_costo_adicional.insert(0, pedido[13])  # Costo Adicional
+            entry_costo_adicional_dolares.delete(0, tk.END)
+            entry_costo_adicional_dolares.insert(0, pedido[13])  # Costo Adicional en Dolares
             entry_numero_factura.delete(0, tk.END)
             entry_numero_factura.insert(0, pedido[14])  # Numero Factura
             entry_costo_total.delete(0, tk.END)
@@ -373,7 +373,7 @@ def limpiar_campos():
     entry_enviado_a.delete(0, tk.END)
     entry_telefono_receptor.delete(0, tk.END)
     entry_descripcion.delete(0, tk.END)
-    entry_costo_adicional.delete(0, tk.END)
+    entry_costo_adicional_dolares.delete(0, tk.END)
     entry_numero_factura.delete(0, tk.END)
     entry_costo_total.delete(0, tk.END)
     estado_var.set("En Proceso")  # Estado predeterminado
@@ -383,7 +383,7 @@ def exportar_a_csv():
     try:
         with open("pedidos.csv", mode="w", newline="", encoding="utf-8") as file:
             writer = csv.writer(file)
-            writer.writerow(["ID", "Fecha y Hora", "Cliente", "Teléfono", "Dirección", "Modelo del Ramo", "Costo en Dolares", "Costo en Bolivares", "Costo por Cobrar", "Fecha y Hora Entrega", "Enviado a", "Descripcion", "Costo Adicional", "Numero de Factura" "Costo Total", "Estado"])
+            writer.writerow(["ID", "Fecha y Hora", "Cliente", "Teléfono", "Dirección", "Modelo del Ramo", "Costo en Dolares", "Costo en Bolivares", "Costo por Cobrar", "Fecha y Hora Entrega", "Enviado a", "Descripcion", "Costo Adicional en Dolares", "Numero de Factura" "Costo Total", "Estado"])
             for row in tree.get_children():
                 writer.writerow(tree.item(row)['values'])
         messagebox.showinfo("Éxito", "Datos exportados correctamente a pedidos.csv")
@@ -645,7 +645,7 @@ hora_entrega_var = tk.StringVar()
 entry_enviado_a = ttk.Entry(form_frame, width=40)
 entry_telefono_receptor = ttk.Entry(form_frame, width=20)
 entry_descripcion = ttk.Entry(form_frame, width=60)
-entry_costo_adicional = ttk.Entry(form_frame, width=20)
+entry_costo_adicional_dolares = ttk.Entry(form_frame, width=20)
 entry_numero_factura = ttk.Entry(form_frame, width=10)
 entry_costo_total = ttk.Entry(form_frame, width=20, state="disabled")
 estado_var = tk.StringVar()
@@ -654,7 +654,7 @@ estado_var = tk.StringVar()
 labels = [
     "Fecha del Pedido", "Hora del Pedido (HH:MM)", "Cliente",
     "Teléfono", "Modelo del Ramo",
-    "Costo en Dolares", "Costo en Bolivares", "Costo por Cobrar", "Fecha de Entrega", "Hora de Entrega (HH:MM)", "Enviado a", "Teléfono Receptor", "Descripcion", "Costo Adicional", "Numero de Factura"
+    "Costo en Dolares", "Costo en Bolivares", "Costo por Cobrar", "Fecha de Entrega", "Hora de Entrega (HH:MM)", "Enviado a", "Teléfono Receptor", "Descripcion", "Costo Adicional en Dolares", "Numero de Factura"
 ]
 row_index = 0  # Índice para controlar las filas
 for i, text in enumerate(labels):
@@ -720,8 +720,8 @@ for i, text in enumerate(labels):
             entry_costo_bolivares.grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
         elif text == "Costo por Cobrar":
             entry_costo_por_cobrar.grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
-        elif text == "Costo Adicional":
-            entry_costo_adicional.grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
+        elif text == "Costo Adicional en Dolares":
+            entry_costo_adicional_dolares.grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
         elif text == "Numero de Factura":
             entry_numero_factura.grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
         """ elif text == "Costo Total":
@@ -775,7 +775,7 @@ ttk.Button(search_frame, text="Buscar", command=buscar_pedidos).pack(side="left"
 # Tabla de pedidos
 tree_frame = ttk.Frame(main_frame)
 tree_frame.pack(fill="both", expand=True, pady=10)
-tree = ttk.Treeview(tree_frame, columns=("ID", "Fecha y Hora", "Cliente", "Teléfono Remitente", "Dirección", "Modelo del Ramo", "Costo en Dolares", "Costo en Bolivares", "Costo por Cobrar", "Fecha y Hora Entrega", "Enviado a", "Teléfono Receptor", "Descripcion", "Costo Adicional", "Numero de Factura", "Costo Total", "Estado"), show="headings")
+tree = ttk.Treeview(tree_frame, columns=("ID", "Fecha y Hora", "Cliente", "Teléfono Remitente", "Dirección", "Modelo del Ramo", "Costo en Dolares", "Costo en Bolivares", "Costo por Cobrar", "Fecha y Hora Entrega", "Enviado a", "Teléfono Receptor", "Descripcion", "Costo Adicional en Dolares", "Numero de Factura", "Costo Total", "Estado"), show="headings")
 for col in tree['columns']:
     tree.heading(col, text=col)
     tree.column(col, width=120, anchor="center")

@@ -27,7 +27,7 @@ def crear_base_datos():
             descripcion TEXT,
             tipo_entrega TEXT,
             delivery_persona TEXT,
-            costo_adicional REAL,
+            costo_adicional_dolares REAL,
             costo_total REAL,
             numero_factura INTEGER NOT NULL,
             estado TEXT)''')
