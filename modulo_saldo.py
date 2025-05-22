@@ -37,6 +37,38 @@ def conectar_db():
   conn.commit()
   conn.close()
 
+def calcular_saldo_bolivares_rango_fechas():
+  try:
+    conn = sqlite3.connect("floristeria.db")
+    cursor = conn.cursor()
+    fecha_hora_inicial = f"{entry_fecha_inicial.get()} {hora_inicial_var.get()}"
+    fecha_hora_final = f"{entry_fecha_final.get()} {hora_inicial_var.get()}"
+    cursor.execute("SELECT SUM(costo_total_bolivares) FROM pedidos WHERE fecha_hora BETWEEN ? AND ?", (fecha_hora_inicial, fecha_hora_final))
+    resultado = cursor.fetchone()[0]
+    costo_acumulado_bolivares = resultado if resultado else 0.0  # Si no hay pedidos, el costo es 0.0
+    costo_acumulado_bolivares_var.set(round(costo_acumulado_bolivares, 2))  # Actualizar la variable con el costo acumulado
+
+  except sqlite3.Error as e:
+    messagebox.showerror("Error", f"Ocurrió un error al calcular el costo en bolivares acumulado: {fecha_hora_inicial} {fecha_hora_final} {e}")
+  finally:
+    conn.close()
+
+def calcular_saldo_por_cobrar_rango_fechas():
+  try:
+    conn = sqlite3.connect("floristeria.db")
+    cursor = conn.cursor()
+    fecha_hora_inicial = f"{entry_fecha_inicial.get()} {hora_inicial_var.get()}"
+    fecha_hora_final = f"{entry_fecha_final.get()} {hora_inicial_var.get()}"
+    cursor.execute("SELECT SUM(costo_total_por_cobrar) FROM pedidos WHERE fecha_hora BETWEEN ? AND ?", (fecha_hora_inicial, fecha_hora_final))
+    resultado = cursor.fetchone()[0]
+    costo_acumulado_por_cobrar = resultado if resultado else 0.0  # Si no hay pedidos, el costo es 0.0
+    costo_acumulado_por_cobrar_var.set(round(costo_acumulado_por_cobrar, 2))  # Actualizar la variable con el costo acumulado
+
+  except sqlite3.Error as e:
+    messagebox.showerror("Error", f"Ocurrió un error al calcular el costo en bolivares acumulado: {fecha_hora_inicial} {fecha_hora_final} {e}")
+  finally:
+    conn.close()
+
 def calcular_saldo_dolares_rango_fechas():
   try:
     conn = sqlite3.connect("floristeria.db")
@@ -49,9 +81,11 @@ def calcular_saldo_dolares_rango_fechas():
     costo_acumulado_dolares_var.set(round(costo_acumulado_dolares, 2))  # Actualizar la variable con el costo acumulado
 
     # Calculo de otros saldos
+    calcular_saldo_bolivares_rango_fechas()
+    calcular_saldo_por_cobrar_rango_fechas()
 
   except sqlite3.Error as e:
-    messagebox.showerror("Error", f"Ocurrió un error al calcular el costo acumulado: {fecha_hora_inicial} {fecha_hora_final} {e}")
+    messagebox.showerror("Error", f"Ocurrió un error al calcular el costo en dolares acumulado: {fecha_hora_inicial} {fecha_hora_final} {e}")
   finally:
     conn.close()
 
@@ -62,11 +96,13 @@ def limpiar_campos():
   entry_fecha_final.set_date(datetime.now().date())
   hora_final_var.set("08:00")
   costo_acumulado_dolares_var.set(0.0)
+  costo_acumulado_bolivares_var.set(0.0)
+  costo_acumulado_por_cobrar_var.set(0.0)
 
 # Configuración de la ventana principal
 root = tk.Tk()
 root.title("Calculo de Costos por rango - Floristería")
-root.geometry("395x580")  # Tamaño inicial de la ventana
+root.geometry("350x420")  # Tamaño inicial de la ventana
 root.resizable(True, True)
 
 # Estilo personalizado
@@ -106,7 +142,8 @@ ttk.Button(btn_frame, text="Limpiar Campos", command=limpiar_campos).pack(side="
 # Bucle para crear los campos del formulario
 labels = [
     "Fecha Inicial", "Hora Inicial (HH:MM)", "Fecha Final",
-    "Hora Final (HH:MM)", "Costo Total"
+    "Hora Final (HH:MM)", "Costo Total Dolares", "Costo Total Bolivares",
+    "Costo Total por Cobrar"
 ]
 
 row_index = 0
@@ -132,11 +169,23 @@ for i, text in enumerate(labels):
     hora_final_var.grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
     hora_final_var.current(0)
     row_index += 1
-  elif text == "Costo Total":
-    # Campo para el costo acumulado
+  elif text == "Costo Total Dolares":
+    # Campo para el costo total dolares
     costo_acumulado_dolares_var = tk.DoubleVar(value=0.0)
-    ttk.Label(form_frame, text="Costo Total:", anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
+    ttk.Label(form_frame, text="Costo Total Dolares:", anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
     ttk.Label(form_frame, textvariable=costo_acumulado_dolares_var, anchor="w").grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
+    row_index += 1
+  elif text == "Costo Total Bolivares":
+    # Campo para el costo total bolivares
+    costo_acumulado_bolivares_var = tk.DoubleVar(value=0.0)
+    ttk.Label(form_frame, text="Costo Total Bolivares:", anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
+    ttk.Label(form_frame, textvariable=costo_acumulado_bolivares_var, anchor="w").grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
+    row_index += 1
+  elif text == "Costo Total por Cobrar":
+    # Campo para el costo total bolivares
+    costo_acumulado_por_cobrar_var = tk.DoubleVar(value=0.0)
+    ttk.Label(form_frame, text="Costo Total por Cobrar:", anchor="w").grid(row=row_index, column=0, padx=5, pady=5, sticky="w")
+    ttk.Label(form_frame, textvariable=costo_acumulado_por_cobrar_var, anchor="w").grid(row=row_index, column=1, padx=5, pady=5, sticky="w")
     row_index += 1
 
 # Ejecutar la aplicación
