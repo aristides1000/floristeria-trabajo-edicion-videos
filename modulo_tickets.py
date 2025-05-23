@@ -112,22 +112,6 @@ def generar_ticket_seleccionado(item_id):
         # Asignar los datos correctamente según el orden de la consulta SQL
         id_pedido, cliente, telefono, direccion, delivery_persona, enviado_a, tipo_entrega, descripcion, estado = pedido
 
-        # Solicitar el nombre del archivo PDF al usuario
-        nombre_archivo = simpledialog.askstring(
-            "Nombre del Ticket",
-            "Ingrese el nombre del ticket (sin extensión):",
-            parent=root
-        )
-
-        # Validar que el usuario haya ingresado un nombre
-        if not nombre_archivo:
-            messagebox.showwarning("Advertencia", "No se ingresó un nombre para el ticket. Usando nombre predeterminado.")
-            nombre_archivo = "ticket_default"
-
-        # Asegurarse de que el nombre termine con .pdf
-        if not nombre_archivo.endswith(".pdf"):
-            nombre_archivo += ".pdf"
-
         # Generar PDF
         pdf = FPDF()
         pdf.add_page()
@@ -148,7 +132,7 @@ def generar_ticket_seleccionado(item_id):
         pdf.cell(200, 10, txt=f"Estado: {estado}", ln=True)
 
         # Guardar y abrir el PDF
-        pdf_path = './tickets/' + nombre_archivo
+        pdf_path = f'./tickets/{id_pedido}.pdf'
         pdf.output(pdf_path)
 
         # Abrir el archivo PDF automáticamente
@@ -157,7 +141,7 @@ def generar_ticket_seleccionado(item_id):
         elif os.name == 'posix':  # macOS o Linux
             os.system(f"open {pdf_path}" if os.uname().sysname == "Darwin" else f"xdg-open {pdf_path}")
 
-        messagebox.showinfo("Éxito", f"Ticket generado correctamente como '{nombre_archivo}' y abierto para impresión.")
+        messagebox.showinfo("Éxito", f"Ticket generado correctamente como '{id_pedido}'.pdf y abierto para impresión.")
     except Exception as e:
         messagebox.showerror("Error", f"Ocurrió un error al generar el ticket: {e}")
 
