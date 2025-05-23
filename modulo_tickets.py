@@ -82,9 +82,8 @@ def actualizar_tipo_entrega():
         cargar_pedidos()
         limpiar_campos()
 
-        # Generar ticket automáticamente si el tipo de entrega es "Delivery"
-        if tipo_entrega == "Delivery":
-            generar_ticket_seleccionado(item_id)
+        # Generar ticket
+        generar_ticket_seleccionado(item_id)
 
         messagebox.showinfo("Éxito", "Tipo de entrega actualizado correctamente.")
     except Exception as e:
