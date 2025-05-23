@@ -24,6 +24,7 @@ def conectar_db():
                     descripcion TEXT,
                     tipo_entrega TEXT,
                     delivery_persona TEXT,
+                    costo_delivery TEXT,
                     costo_adicional_dolares REAL,
                     costo_adicional_bolivares REAL,
                     costo_adicional_por_cobrar REAL,
