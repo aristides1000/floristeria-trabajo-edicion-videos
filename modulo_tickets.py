@@ -119,19 +119,34 @@ def generar_ticket_seleccionado(item_id):
         pdf.set_auto_page_break(auto=True, margin=15)
         pdf.set_font("Arial", size=12)
 
-        pdf.cell(200, 10, txt="Ticket de Entrega", ln=True, align="C")
+        # Ticket de la oficina
+        pdf.rect(8, 8, 128, 200, style = 'D')
+
+        pdf.image('./images/logo-secret-of-the-roses.jpg', x = 10, y = 12, w = 123, type = '')
+
+        pdf.ln(30)
+        pdf.cell(123, 10, txt="Uso de la Oficina", ln=True, align='C')
         pdf.ln(10)
 
-        pdf.cell(200, 10, txt=f"ID Pedido: {id_pedido}", ln=True)
-        pdf.cell(200, 10, txt=f"Cliente: {cliente}", ln=True)
-        pdf.cell(200, 10, txt=f"Teléfono: {telefono}", ln=True)
-        pdf.cell(200, 10, txt=f"Dirección: {direccion}", ln=True)
-        pdf.cell(200, 10, txt=f"Persona que realiza el Delivery: {delivery_persona}", ln=True)
-        pdf.cell(200, 10, txt=f"Costo del Delivery: {costo_delivery}", ln=True)
-        pdf.cell(200, 10, txt=f"Enviado a: {enviado_a}", ln=True)
-        pdf.cell(200, 10, txt=f"Tipo de Entrega: {tipo_entrega}", ln=True),
-        pdf.cell(200, 10, txt=f"Descripcion: {descripcion}", ln=True),
-        pdf.cell(200, 10, txt=f"Estado: {estado}", ln=True)
+        pdf.cell(123, 10, txt=f"ID Pedido: {id_pedido}", ln=True)
+        pdf.cell(123, 10, txt=f"Cliente: {cliente}", ln=True)
+        pdf.cell(123, 10, txt=f"Teléfono: {telefono}", ln=True)
+        pdf.cell(123, 10, txt=f"Dirección: {direccion}", ln=True)
+        pdf.cell(123, 10, txt=f"Nombre del Delivery: {delivery_persona}", ln=True)
+        pdf.cell(123, 10, txt=f"Costo del Delivery: {costo_delivery}", ln=True)
+        pdf.cell(123, 10, txt=f"Enviado a: {enviado_a}", ln=True)
+        pdf.cell(123, 10, txt=f"Tipo de Entrega: {tipo_entrega}", ln=True),
+        pdf.cell(123, 10, txt=f"Descripcion: {descripcion}", ln=True),
+        pdf.cell(123, 10, txt=f"Estado: {estado}", ln=True)
+
+        # Ticket de la Nota de entrega
+        pdf.rect(143, 8, 128, 200, style = 'D')
+
+        pdf.image('./images/logo-secret-of-the-roses.jpg', x = 145, y = 12, w = 123, type = '')
+
+        pdf.text(193, 47, txt="Nota de Entrega")
+
+        
 
         # Guardar y abrir el PDF
         pdf_path = f'./tickets/{id_pedido}.pdf'
@@ -153,7 +168,7 @@ def limpiar_campos():
     entry_delivery_persona.delete(0, tk.END)
     entry_costo_delivery.delete(0, tk.END)
 
-# Función para actualizar el campo "Persona que realiza el Delivery" según el tipo de entrega
+# Función para actualizar el campo "Nombre del Delivery" según el tipo de entrega
 def actualizar_delivery_persona(event):
     tipo_entrega = combo_tipo_entrega.get()
     if tipo_entrega == "Recoger":
@@ -200,7 +215,7 @@ combo_tipo_entrega = ttk.Combobox(root, values=["Recoger", "Delivery"], state="r
 combo_tipo_entrega.grid(row=0, column=1, padx=10, pady=5, sticky="w")
 combo_tipo_entrega.bind("<<ComboboxSelected>>", actualizar_delivery_persona)  # Evento para actualizar el campo
 
-tk.Label(root, text="Persona que realiza el Delivery:", bg="#f0f0f0", font=("Arial", 10, "bold")).grid(row=1, column=0, padx=10, pady=5, sticky="w")
+tk.Label(root, text="Nombre del Delivery:", bg="#f0f0f0", font=("Arial", 10, "bold")).grid(row=1, column=0, padx=10, pady=5, sticky="w")
 entry_delivery_persona = tk.Entry(root, width=20, font=("Arial", 10))
 entry_delivery_persona.grid(row=1, column=1, padx=10, pady=5, sticky="w")
 
@@ -216,7 +231,7 @@ btn_actualizar = ttk.Button(frame_botones, text="Actualizar Tipo de Entrega", co
 btn_actualizar.grid(row=0, column=0, padx=5)
 
 # Tabla de pedidos
-columns = ("ID", "Cliente", "Teléfono", "Dirección", "Persona que realiza el Delivery", "Costo del Delivery", "Enviado a", "Tipo de Entrega", "Descripcion", "Estado")
+columns = ("ID", "Cliente", "Teléfono", "Dirección", "Nombre del Delivery", "Costo del Delivery", "Enviado a", "Tipo de Entrega", "Descripcion", "Estado")
 tree_pedidos = ttk.Treeview(root, columns=columns, show="headings", height=10)
 for col in columns:
     tree_pedidos.heading(col, text=col)
