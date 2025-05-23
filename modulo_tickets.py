@@ -114,7 +114,7 @@ def generar_ticket_seleccionado(item_id):
         id_pedido, cliente, telefono, direccion, delivery_persona, costo_delivery, enviado_a, tipo_entrega, descripcion, estado = pedido
 
         # Generar PDF
-        pdf = FPDF()
+        pdf = FPDF(orientation = 'L', unit = 'mm', format='Letter')
         pdf.add_page()
         pdf.set_auto_page_break(auto=True, margin=15)
         pdf.set_font("Arial", size=12)
