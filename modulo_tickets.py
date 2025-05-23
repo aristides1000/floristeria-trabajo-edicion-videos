@@ -148,7 +148,7 @@ def generar_ticket_seleccionado(item_id):
         pdf.cell(200, 10, txt=f"Estado: {estado}", ln=True)
 
         # Guardar y abrir el PDF
-        pdf_path = nombre_archivo
+        pdf_path = './tickets/' + nombre_archivo
         pdf.output(pdf_path)
 
         # Abrir el archivo PDF automáticamente
@@ -176,6 +176,13 @@ def actualizar_delivery_persona(event):
     else:
         entry_delivery_persona.config(state="normal")  # Habilitar edición
         entry_delivery_persona.delete(0, tk.END)
+
+#Funcion para la verificacion de la existencia de la carpeta tickets, esta usada para el guardado todos los tickets generados. Si no existe, crearla.
+def verificacion_creacion_carpeta_tickets():
+    ruta_carpeta = './tickets'
+
+    if not os.path.isdir(ruta_carpeta):
+        os.mkdir('./tickets')
 
 # Configuración de la interfaz gráfica
 root = tk.Tk()
@@ -227,6 +234,9 @@ tree_pedidos.configure(yscrollcommand=scrollbar.set)
 
 # Cargar pedidos iniciales
 cargar_pedidos()
+
+# Ejecucuion de la funcion de creacion de la carpeta tickets
+verificacion_creacion_carpeta_tickets()
 
 # Ejecutar la aplicación
 root.mainloop()
