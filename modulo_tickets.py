@@ -125,7 +125,7 @@ def generar_ticket_seleccionado(item_id):
         pdf.image('./images/logo-secret-of-the-roses.jpg', x = 10, y = 12, w = 123, type = '')
 
         pdf.ln(30)
-        pdf.cell(123, 10, txt="Uso de la Oficina", ln=True, align='C')
+        pdf.cell(123, 10, txt="Orden", ln=True, align='C')
         pdf.ln(10)
 
         pdf.cell(123, 10, txt=f"ID Pedido: {id_pedido}", ln=True)
