@@ -101,7 +101,7 @@ def generar_ticket_seleccionado(item_id):
 
         # Consulta SQL: Asegurarse de que el orden de las columnas coincida con el de la tabla Treeview
         cursor.execute('''
-            SELECT id, numero_factura, cliente, telefono, direccion, delivery_persona, costo_delivery, florista, enviado_a, tipo_entrega, descripcion, estado, fecha_hora_entrega
+            SELECT id, numero_factura, cliente, telefono, direccion, delivery_persona, costo_delivery, florista, enviado_a, tipo_entrega, descripcion, estado, fecha_hora_entrega, modelo_ramo
             FROM pedidos
             WHERE id = ?
         ''', (item_id,))
@@ -113,7 +113,7 @@ def generar_ticket_seleccionado(item_id):
             return
 
         # Asignar los datos correctamente según el orden de la consulta SQL
-        id_pedido, numero_factura, cliente, telefono, direccion, delivery_persona, costo_delivery, florista, enviado_a, tipo_entrega, descripcion, estado, fecha_hora_entrega = pedido
+        id_pedido, numero_factura, cliente, telefono, direccion, delivery_persona, costo_delivery, florista, enviado_a, tipo_entrega, descripcion, estado, fecha_hora_entrega, modelo_ramo = pedido
 
         # Generar PDF
         pdf = FPDF(orientation = 'L', unit = 'mm', format='Letter')
@@ -132,17 +132,20 @@ def generar_ticket_seleccionado(item_id):
 
         pdf.cell(123, 10, txt=f"Nro Factura: {numero_factura}", ln=True)
         pdf.cell(123, 10, txt=f"Nro Pedido: {id_pedido}", ln=True)
-        # Quede actualizando la hora Aqui
-        pdf.cell(123, 10, txt=f"Fecha: {fecha_hora_entrega}", ln=True)
-        pdf.cell(123, 10, txt=f"Teléfono: {telefono}", ln=True)
-        pdf.cell(123, 10, txt=f"Dirección: {direccion}", ln=True)
-        pdf.cell(123, 10, txt=f"Nombre del Delivery: {delivery_persona}", ln=True)
-        pdf.cell(123, 10, txt=f"Costo del Delivery: {costo_delivery}", ln=True)
-        pdf.cell(123, 10, txt=f"Florista Encargado: {florista}", ln=True)
+        day = fecha_hora_entrega[8:10]
+        month = fecha_hora_entrega[5:7]
+        year = fecha_hora_entrega[:4]
+        hour = fecha_hora_entrega[11:]
+        pdf.cell(123, 10, txt=f"Fecha: {day}/{month}/{year}", ln=True)
+        pdf.cell(123, 10, txt=f"Hora: {hour}", ln=True)
+        pdf.cell(123, 10, txt=f"Enviado por: {cliente}", ln=True)
         pdf.cell(123, 10, txt=f"Enviado a: {enviado_a}", ln=True)
-        pdf.cell(123, 10, txt=f"Tipo de Entrega: {tipo_entrega}", ln=True),
-        pdf.cell(123, 10, txt=f"Descripcion: {descripcion}", ln=True),
-        pdf.cell(123, 10, txt=f"Estado: {estado}", ln=True)
+        pdf.cell(123, 10, txt=f"Florista Encargado: {florista}", ln=True)
+        pdf.cell(123, 10, txt="Modelo de Ramo:", ln=True)
+        pdf.cell(123, 10, txt=modelo_ramo, ln=True)
+        pdf.cell(123, 10, txt=f"Descripcion: {descripcion[:50]}", ln=True)
+        pdf.cell(123, 10, txt=descripcion[50:118], ln=True)
+        pdf.cell(123, 10, txt=descripcion[118:], ln=True)
 
         # Ticket de la Nota de entrega
         pdf.rect(143, 8, 128, 200, style = 'D')
