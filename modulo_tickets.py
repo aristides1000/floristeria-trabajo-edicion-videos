@@ -49,7 +49,7 @@ def cargar_pedidos():
 
     # Consulta SQL: Asegurarse de que el orden de las columnas coincida con el de la tabla Treeview
     cursor.execute('''
-        SELECT id, cliente, telefono, direccion, delivery_persona, costo_delivery, florista, enviado_a, tipo_entrega, descripcion, estado
+        SELECT id, numero_factura, cliente, telefono, direccion, delivery_persona, costo_delivery, florista, enviado_a, tipo_entrega, descripcion, estado
         FROM pedidos
         WHERE estado = "En Proceso"
     ''')
@@ -101,7 +101,7 @@ def generar_ticket_seleccionado(item_id):
 
         # Consulta SQL: Asegurarse de que el orden de las columnas coincida con el de la tabla Treeview
         cursor.execute('''
-            SELECT id, cliente, telefono, direccion, delivery_persona, costo_delivery, florista, enviado_a, tipo_entrega, descripcion, estado
+            SELECT id, numero_factura, cliente, telefono, direccion, delivery_persona, costo_delivery, florista, enviado_a, tipo_entrega, descripcion, estado
             FROM pedidos
             WHERE id = ?
         ''', (item_id,))
@@ -113,7 +113,7 @@ def generar_ticket_seleccionado(item_id):
             return
 
         # Asignar los datos correctamente según el orden de la consulta SQL
-        id_pedido, cliente, telefono, direccion, delivery_persona, costo_delivery, florista, enviado_a, tipo_entrega, descripcion, estado = pedido
+        id_pedido, numero_factura, cliente, telefono, direccion, delivery_persona, costo_delivery, florista, enviado_a, tipo_entrega, descripcion, estado = pedido
 
         # Generar PDF
         pdf = FPDF(orientation = 'L', unit = 'mm', format='Letter')
@@ -198,7 +198,7 @@ def verificacion_creacion_carpeta_tickets():
 # Configuración de la interfaz gráfica
 root = tk.Tk()
 root.title("Gestión de Pedidos - Floristería")
-root.geometry("1370x440")
+root.geometry("1490x440")
 root.configure(bg="#f0f0f0")  # Fondo claro
 
 # Estilo para los widgets
@@ -239,7 +239,7 @@ btn_actualizar = ttk.Button(frame_botones, text="Actualizar Tipo de Entrega", co
 btn_actualizar.grid(row=0, column=0, padx=5)
 
 # Tabla de pedidos
-columns = ("ID", "Cliente", "Teléfono", "Dirección", "Nombre del Delivery", "Costo del Delivery", "Florista Encargado", "Enviado a", "Tipo de Entrega", "Descripcion", "Estado")
+columns = ("ID", "Nro Factura", "Cliente", "Teléfono", "Dirección", "Nombre del Delivery", "Costo del Delivery", "Florista Encargado", "Enviado a", "Tipo de Entrega", "Descripcion", "Estado")
 tree_pedidos = ttk.Treeview(root, columns=columns, show="headings", height=10)
 for col in columns:
     tree_pedidos.heading(col, text=col)
