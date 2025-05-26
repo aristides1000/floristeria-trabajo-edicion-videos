@@ -28,6 +28,7 @@ def crear_base_datos():
             tipo_entrega TEXT,
             delivery_persona TEXT,
             costo_delivery TEXT,
+            florista TEXT,
             costo_adicional_dolares REAL,
             costo_adicional_bolivares REAL,
             costo_adicional_por_cobrar REAL,
@@ -48,7 +49,7 @@ def cargar_pedidos():
 
     # Consulta SQL: Asegurarse de que el orden de las columnas coincida con el de la tabla Treeview
     cursor.execute('''
-        SELECT id, cliente, telefono, direccion, delivery_persona, costo_delivery, enviado_a, tipo_entrega, descripcion, estado
+        SELECT id, cliente, telefono, direccion, delivery_persona, costo_delivery, florista, enviado_a, tipo_entrega, descripcion, estado
         FROM pedidos
         WHERE estado = "En Proceso"
     ''')
@@ -68,15 +69,16 @@ def actualizar_tipo_entrega():
     tipo_entrega = combo_tipo_entrega.get()
     delivery_persona = entry_delivery_persona.get() if tipo_entrega == "Delivery" else "Retiran en Floristería"
     costo_delivery = float(0 if (entry_costo_delivery.get() == '') else entry_costo_delivery.get())
+    florista = entry_florista.get()
 
     try:
         conn = sqlite3.connect('floristeria.db')
         cursor = conn.cursor()
         cursor.execute('''
             UPDATE pedidos
-            SET tipo_entrega = ?, delivery_persona = ?, costo_delivery = ?
+            SET tipo_entrega = ?, delivery_persona = ?, costo_delivery = ?, florista = ?
             WHERE id = ?
-        ''', (tipo_entrega, delivery_persona, costo_delivery, item_id))
+        ''', (tipo_entrega, delivery_persona, costo_delivery, florista, item_id))
         conn.commit()
         conn.close()
 
@@ -99,7 +101,7 @@ def generar_ticket_seleccionado(item_id):
 
         # Consulta SQL: Asegurarse de que el orden de las columnas coincida con el de la tabla Treeview
         cursor.execute('''
-            SELECT id, cliente, telefono, direccion, delivery_persona, costo_delivery, enviado_a, tipo_entrega, descripcion, estado
+            SELECT id, cliente, telefono, direccion, delivery_persona, costo_delivery, florista, enviado_a, tipo_entrega, descripcion, estado
             FROM pedidos
             WHERE id = ?
         ''', (item_id,))
@@ -111,7 +113,7 @@ def generar_ticket_seleccionado(item_id):
             return
 
         # Asignar los datos correctamente según el orden de la consulta SQL
-        id_pedido, cliente, telefono, direccion, delivery_persona, costo_delivery, enviado_a, tipo_entrega, descripcion, estado = pedido
+        id_pedido, cliente, telefono, direccion, delivery_persona, costo_delivery, florista, enviado_a, tipo_entrega, descripcion, estado = pedido
 
         # Generar PDF
         pdf = FPDF(orientation = 'L', unit = 'mm', format='Letter')
@@ -134,6 +136,7 @@ def generar_ticket_seleccionado(item_id):
         pdf.cell(123, 10, txt=f"Dirección: {direccion}", ln=True)
         pdf.cell(123, 10, txt=f"Nombre del Delivery: {delivery_persona}", ln=True)
         pdf.cell(123, 10, txt=f"Costo del Delivery: {costo_delivery}", ln=True)
+        pdf.cell(123, 10, txt=f"Florista Encargado: {florista}", ln=True)
         pdf.cell(123, 10, txt=f"Enviado a: {enviado_a}", ln=True)
         pdf.cell(123, 10, txt=f"Tipo de Entrega: {tipo_entrega}", ln=True),
         pdf.cell(123, 10, txt=f"Descripcion: {descripcion}", ln=True),
@@ -167,6 +170,7 @@ def limpiar_campos():
     combo_tipo_entrega.set("")
     entry_delivery_persona.delete(0, tk.END)
     entry_costo_delivery.delete(0, tk.END)
+    entry_florista.delete(0, tk.END)
 
 # Función para actualizar el campo "Nombre del Delivery" según el tipo de entrega
 def actualizar_delivery_persona(event):
@@ -194,7 +198,7 @@ def verificacion_creacion_carpeta_tickets():
 # Configuración de la interfaz gráfica
 root = tk.Tk()
 root.title("Gestión de Pedidos - Floristería")
-root.geometry("1250x420")
+root.geometry("1370x440")
 root.configure(bg="#f0f0f0")  # Fondo claro
 
 # Estilo para los widgets
@@ -216,31 +220,35 @@ combo_tipo_entrega.grid(row=0, column=1, padx=10, pady=5, sticky="w")
 combo_tipo_entrega.bind("<<ComboboxSelected>>", actualizar_delivery_persona)  # Evento para actualizar el campo
 
 tk.Label(root, text="Nombre del Delivery:", bg="#f0f0f0", font=("Arial", 10, "bold")).grid(row=1, column=0, padx=10, pady=5, sticky="w")
-entry_delivery_persona = tk.Entry(root, width=20, font=("Arial", 10))
+entry_delivery_persona = tk.Entry(root, width=25, font=("Arial", 10))
 entry_delivery_persona.grid(row=1, column=1, padx=10, pady=5, sticky="w")
 
 tk.Label(root, text="Costo del Delivery:", bg="#f0f0f0", font=("Arial", 10, "bold")).grid(row=2, column=0, padx=10, pady=5, sticky="w")
 entry_costo_delivery = tk.Entry(root, width=15, font=("Arial", 10))
 entry_costo_delivery.grid(row=2, column=1, padx=10, pady=5, sticky="w")
 
+tk.Label(root, text="Florista Encargado:", bg="#f0f0f0", font=("Arial", 10, "bold")).grid(row=3, column=0, padx=10, pady=5, sticky="w")
+entry_florista = tk.Entry(root, width=25, font=("Arial", 10))
+entry_florista.grid(row=3, column=1, padx=10, pady=5, sticky="w")
+
 # Botones
 frame_botones = tk.Frame(root, bg="#f0f0f0")
-frame_botones.grid(row=3, column=0, columnspan=2, pady=10)
+frame_botones.grid(row=4, column=0, columnspan=2, pady=10)
 
 btn_actualizar = ttk.Button(frame_botones, text="Actualizar Tipo de Entrega", command=actualizar_tipo_entrega)
 btn_actualizar.grid(row=0, column=0, padx=5)
 
 # Tabla de pedidos
-columns = ("ID", "Cliente", "Teléfono", "Dirección", "Nombre del Delivery", "Costo del Delivery", "Enviado a", "Tipo de Entrega", "Descripcion", "Estado")
+columns = ("ID", "Cliente", "Teléfono", "Dirección", "Nombre del Delivery", "Costo del Delivery", "Florista Encargado", "Enviado a", "Tipo de Entrega", "Descripcion", "Estado")
 tree_pedidos = ttk.Treeview(root, columns=columns, show="headings", height=10)
 for col in columns:
     tree_pedidos.heading(col, text=col)
     tree_pedidos.column(col, width=120, anchor="center")
-tree_pedidos.grid(row=4, column=0, columnspan=2, padx=10, pady=10)
+tree_pedidos.grid(row=5, column=0, columnspan=2, padx=10, pady=10)
 
 # Scrollbar para la tabla
 scrollbar = ttk.Scrollbar(root, orient="vertical", command=tree_pedidos.yview)
-scrollbar.grid(row=4, column=2, sticky="ns")
+scrollbar.grid(row=5, column=2, sticky="ns")
 tree_pedidos.configure(yscrollcommand=scrollbar.set)
 
 # Cargar pedidos iniciales
