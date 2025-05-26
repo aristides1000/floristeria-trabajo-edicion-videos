@@ -101,7 +101,7 @@ def generar_ticket_seleccionado(item_id):
 
         # Consulta SQL: Asegurarse de que el orden de las columnas coincida con el de la tabla Treeview
         cursor.execute('''
-            SELECT id, numero_factura, cliente, telefono, direccion, delivery_persona, costo_delivery, florista, enviado_a, tipo_entrega, descripcion, estado, fecha_hora_entrega, modelo_ramo
+            SELECT id, numero_factura, cliente, telefono, direccion, delivery_persona, costo_delivery, florista, enviado_a, tipo_entrega, descripcion, estado, fecha_hora_entrega, modelo_ramo, telefono_receptor
             FROM pedidos
             WHERE id = ?
         ''', (item_id,))
@@ -113,7 +113,7 @@ def generar_ticket_seleccionado(item_id):
             return
 
         # Asignar los datos correctamente según el orden de la consulta SQL
-        id_pedido, numero_factura, cliente, telefono, direccion, delivery_persona, costo_delivery, florista, enviado_a, tipo_entrega, descripcion, estado, fecha_hora_entrega, modelo_ramo = pedido
+        id_pedido, numero_factura, cliente, telefono, direccion, delivery_persona, costo_delivery, florista, enviado_a, tipo_entrega, descripcion, estado, fecha_hora_entrega, modelo_ramo, telefono_receptor = pedido
 
         # Generar PDF
         pdf = FPDF(orientation = 'L', unit = 'mm', format='Letter')
@@ -130,7 +130,7 @@ def generar_ticket_seleccionado(item_id):
         pdf.cell(123, 10, txt="Orden", ln=True, align='C')
         pdf.ln(10)
 
-        pdf.cell(123, 10, txt=f"Nro Factura: {numero_factura}", ln=True)
+        pdf.cell(123, 10, txt=f"Nro Orden: {numero_factura}", ln=True)
         pdf.cell(123, 10, txt=f"Nro Pedido: {id_pedido}", ln=True)
         day = fecha_hora_entrega[8:10]
         month = fecha_hora_entrega[5:7]
@@ -144,8 +144,7 @@ def generar_ticket_seleccionado(item_id):
         pdf.cell(123, 10, txt="Modelo de Ramo:", ln=True)
         pdf.cell(123, 10, txt=modelo_ramo, ln=True)
         pdf.cell(123, 10, txt=f"Descripcion: {descripcion[:50]}", ln=True)
-        pdf.cell(123, 10, txt=descripcion[50:118], ln=True)
-        pdf.cell(123, 10, txt=descripcion[118:], ln=True)
+        pdf.cell(123, 10, txt=descripcion[50:], ln=True)
 
         # Ticket de la Nota de entrega
         pdf.rect(143, 8, 128, 200, style = 'D')
@@ -154,7 +153,8 @@ def generar_ticket_seleccionado(item_id):
 
         pdf.text(193, 47, txt="Nota de Entrega")
 
-        
+        # Quede aqui ATENCION!!!
+        pdf.text(193, 47, txt=f"Nro Orden: {numero_factura}")
 
         # Guardar y abrir el PDF
         pdf_path = f'./tickets/{id_pedido}.pdf'
