@@ -101,7 +101,7 @@ def generar_ticket_seleccionado(item_id):
 
         # Consulta SQL: Asegurarse de que el orden de las columnas coincida con el de la tabla Treeview
         cursor.execute('''
-            SELECT id, numero_factura, cliente, telefono, direccion, delivery_persona, costo_delivery, florista, enviado_a, tipo_entrega, descripcion, estado
+            SELECT id, numero_factura, cliente, telefono, direccion, delivery_persona, costo_delivery, florista, enviado_a, tipo_entrega, descripcion, estado, fecha_hora_entrega
             FROM pedidos
             WHERE id = ?
         ''', (item_id,))
@@ -113,7 +113,7 @@ def generar_ticket_seleccionado(item_id):
             return
 
         # Asignar los datos correctamente según el orden de la consulta SQL
-        id_pedido, numero_factura, cliente, telefono, direccion, delivery_persona, costo_delivery, florista, enviado_a, tipo_entrega, descripcion, estado = pedido
+        id_pedido, numero_factura, cliente, telefono, direccion, delivery_persona, costo_delivery, florista, enviado_a, tipo_entrega, descripcion, estado, fecha_hora_entrega = pedido
 
         # Generar PDF
         pdf = FPDF(orientation = 'L', unit = 'mm', format='Letter')
@@ -130,8 +130,10 @@ def generar_ticket_seleccionado(item_id):
         pdf.cell(123, 10, txt="Orden", ln=True, align='C')
         pdf.ln(10)
 
-        pdf.cell(123, 10, txt=f"ID Pedido: {id_pedido}", ln=True)
-        pdf.cell(123, 10, txt=f"Cliente: {cliente}", ln=True)
+        pdf.cell(123, 10, txt=f"Nro Factura: {numero_factura}", ln=True)
+        pdf.cell(123, 10, txt=f"Nro Pedido: {id_pedido}", ln=True)
+        # Quede actualizando la hora Aqui
+        pdf.cell(123, 10, txt=f"Fecha: {fecha_hora_entrega}", ln=True)
         pdf.cell(123, 10, txt=f"Teléfono: {telefono}", ln=True)
         pdf.cell(123, 10, txt=f"Dirección: {direccion}", ln=True)
         pdf.cell(123, 10, txt=f"Nombre del Delivery: {delivery_persona}", ln=True)
