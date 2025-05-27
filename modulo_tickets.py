@@ -279,7 +279,7 @@ scrollbar_y = ttk.Scrollbar(root, orient="vertical", command=tree_pedidos.yview)
 scrollbar_y.grid(row=5, column=2, sticky="ns")
 tree_pedidos.configure(yscrollcommand=scrollbar_y.set)
 scrollbar_x = ttk.Scrollbar(root, orient="horizontal", command=tree_pedidos.xview)
-scrollbar_x.grid(row=6, column=0, columnspan=2, sticky="swe")
+scrollbar_x.grid(row=6, column=0, sticky="swe")
 tree_pedidos.configure(xscrollcommand=scrollbar_x.set)
 
 # Cargar pedidos iniciales
