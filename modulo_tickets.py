@@ -271,7 +271,7 @@ columns = ("ID", "Nro Factura", "Cliente", "Teléfono", "Dirección", "Nombre de
 tree_pedidos = ttk.Treeview(root, columns=columns, show="headings", height=10)
 for col in columns:
     tree_pedidos.heading(col, text=col)
-    tree_pedidos.column(col, width=90, anchor="center")
+    tree_pedidos.column(col, width=90, anchor="center", stretch=False)
 tree_pedidos.grid(row=5, column=0, columnspan=2, padx=10, pady=10)
 
 # Scrollbar para la tabla
