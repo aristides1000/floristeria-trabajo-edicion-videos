@@ -115,6 +115,12 @@ def generar_ticket_seleccionado(item_id):
         # Asignar los datos correctamente según el orden de la consulta SQL
         id_pedido, numero_factura, cliente, telefono, direccion, delivery_persona, costo_delivery, florista, enviado_a, tipo_entrega, descripcion, estado, fecha_hora_entrega, modelo_ramo, telefono_receptor = pedido
 
+        # Captura de datos para dar formato a Fecha y hora
+        day = fecha_hora_entrega[8:10]
+        month = fecha_hora_entrega[5:7]
+        year = fecha_hora_entrega[:4]
+        hour = fecha_hora_entrega[11:]
+
         # Generar PDF
         pdf = FPDF(orientation = 'L', unit = 'mm', format='Letter')
         pdf.add_page()
@@ -132,19 +138,15 @@ def generar_ticket_seleccionado(item_id):
 
         pdf.cell(123, 10, txt=f"Nro Orden: {numero_factura}", ln=True)
         pdf.cell(123, 10, txt=f"Nro Pedido: {id_pedido}", ln=True)
-        day = fecha_hora_entrega[8:10]
-        month = fecha_hora_entrega[5:7]
-        year = fecha_hora_entrega[:4]
-        hour = fecha_hora_entrega[11:]
-        pdf.cell(123, 10, txt=f"Fecha: {day}/{month}/{year}", ln=True)
-        pdf.cell(123, 10, txt=f"Hora: {hour}", ln=True)
+        pdf.cell(123, 10, txt=f"Fecha de entrega: {day}/{month}/{year}", ln=True)
+        pdf.cell(123, 10, txt=f"Hora de entrega: {hour}", ln=True)
         pdf.cell(123, 10, txt=f"Enviado por: {cliente}", ln=True)
         pdf.cell(123, 10, txt=f"Enviado a: {enviado_a}", ln=True)
         pdf.cell(123, 10, txt=f"Florista Encargado: {florista}", ln=True)
         pdf.cell(123, 10, txt="Modelo de Ramo:", ln=True)
-        pdf.cell(123, 10, txt=modelo_ramo, ln=True)
+        pdf.cell(123, 5, txt=modelo_ramo, ln=True)
         pdf.cell(123, 10, txt=f"Descripcion: {descripcion[:50]}", ln=True)
-        pdf.cell(123, 10, txt=descripcion[50:], ln=True)
+        pdf.cell(123, 5, txt=descripcion[50:], ln=True)
 
         # Ticket de la Nota de entrega
         pdf.rect(143, 8, 128, 200, style = 'D')
@@ -153,8 +155,23 @@ def generar_ticket_seleccionado(item_id):
 
         pdf.text(193, 47, txt="Nota de Entrega")
 
-        # Quede aqui ATENCION!!!
-        pdf.text(193, 47, txt=f"Nro Orden: {numero_factura}")
+        pdf.text(146, 57, txt=f"Nro Orden: {numero_factura}")
+        pdf.text(146, 67, txt=f"Nro Pedido: {id_pedido}")
+        pdf.text(146, 77, txt=f"Enviado por: {cliente}")
+        pdf.text(146, 87, txt=f"Enviado a: {enviado_a}")
+        pdf.text(146, 97, txt=f"Telefono receptor: {telefono_receptor}")
+        pdf.text(146, 107, txt=f"Telefono remitente: {telefono}")
+        pdf.text(146, 112, txt="Solo llamar en casos de emergencia al remitente")
+        pdf.text(146, 122, txt=f"Fecha de entrega: {day}/{month}/{year}")
+        pdf.text(146, 132, txt=f"Hora de entrega: {hour}")
+        pdf.text(146, 142, txt=f"Nombre del delivery: {delivery_persona}")
+        pdf.text(146, 152, txt=f"Costo del delivery: {costo_delivery}")
+        pdf.text(146, 162, txt=f"Modelo de Ramo:")
+        pdf.text(146, 167, txt=modelo_ramo)
+        pdf.text(146, 177, txt=f"Descripcion: {descripcion[:50]}")
+        pdf.text(146, 182, txt=descripcion[50:])
+        pdf.text(146, 192, txt=f"Direccion: {direccion[:52]}")
+        pdf.text(146, 197, txt=direccion[52:])
 
         # Guardar y abrir el PDF
         pdf_path = f'./tickets/{id_pedido}.pdf'
