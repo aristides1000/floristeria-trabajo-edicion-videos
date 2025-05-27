@@ -226,7 +226,7 @@ def verificacion_creacion_carpeta_tickets():
 # Configuración de la interfaz gráfica
 root = tk.Tk()
 root.title("Gestión de Pedidos - Floristería")
-root.geometry("1490x440")
+root.geometry("1490x460")
 root.configure(bg="#f0f0f0")  # Fondo claro
 
 # Estilo para los widgets
@@ -275,9 +275,12 @@ for col in columns:
 tree_pedidos.grid(row=5, column=0, columnspan=2, padx=10, pady=10)
 
 # Scrollbar para la tabla
-scrollbar = ttk.Scrollbar(root, orient="vertical", command=tree_pedidos.yview)
-scrollbar.grid(row=5, column=2, sticky="ns")
-tree_pedidos.configure(yscrollcommand=scrollbar.set)
+scrollbar_y = ttk.Scrollbar(root, orient="vertical", command=tree_pedidos.yview)
+scrollbar_y.grid(row=5, column=2, sticky="ns")
+tree_pedidos.configure(yscrollcommand=scrollbar_y.set)
+scrollbar_x = ttk.Scrollbar(root, orient="horizontal", command=tree_pedidos.xview)
+scrollbar_x.grid(row=6, column=0, columnspan=2, sticky="swe")
+tree_pedidos.configure(xscrollcommand=scrollbar_x.set)
 
 # Cargar pedidos iniciales
 cargar_pedidos()
