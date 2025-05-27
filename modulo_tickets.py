@@ -130,7 +130,7 @@ def generar_ticket_seleccionado(item_id):
         # Ticket de la oficina
         pdf.rect(8, 8, 128, 200, style = 'D')
 
-        pdf.image('./images/logo-secret-of-the-roses.jpg', x = 10, y = 12, w = 123, type = '')
+        pdf.image('./images/logo-secret-of-the-roses.jpg', x = 10, y = 12, w = 123, type = 'JPG')
 
         pdf.ln(30)
         pdf.cell(123, 10, txt="Orden", ln=True, align='C')
