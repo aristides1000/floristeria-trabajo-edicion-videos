@@ -2,7 +2,13 @@ import tkinter as tk
 from tkinter import ttk, messagebox, simpledialog  # Importar simpledialog para solicitar entrada
 import sqlite3
 from fpdf import FPDF  # Para generar PDFs
+from dotenv import load_dotenv # para ejecutar las variables de ambiente
 import os  # Para abrir el archivo PDF
+
+load_dotenv()  # Carga las variables desde .env
+
+# Acceder a las variables .env
+project_path = os.getenv("PROJECT_PATH")
 
 # Crear la base de datos SQLite
 def crear_base_datos():
@@ -174,7 +180,7 @@ def generar_ticket_seleccionado(item_id):
         pdf.text(146, 197, txt=direccion[52:])
 
         # Guardar y abrir el PDF
-        pdf_path = f'./tickets/{id_pedido}.pdf'
+        pdf_path = f'{project_path}/tickets/{id_pedido}.pdf'
         pdf.output(pdf_path)
 
         # Abrir el archivo PDF automáticamente
