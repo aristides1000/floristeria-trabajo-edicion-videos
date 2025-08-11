@@ -1,3 +1,4 @@
 .env
 floristeria.db
 usuarios.db
+/tickets
